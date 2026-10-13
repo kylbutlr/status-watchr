@@ -1,0 +1,138 @@
+/* Generated from tokens/app-stylr.json by npm run build. Do not edit. */
+
+:root {
+  --app-stylr-version: "1.2.0";
+
+  --brand-ink: #111111;
+  --brand-charcoal: #2E3135;
+  --brand-slate: #49545B;
+  --brand-steel: #647B81;
+  --brand-sage: #83A4A3;
+  --brand-mint: #A9CEC2;
+
+  --font-sans: "Geist Sans", Inter, ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, SFMono-Regular, Consolas, monospace;
+
+  --type-display-size: 40px;
+  --type-display-line-height: 44px;
+  --type-display-weight: 700;
+  --type-display-letter-spacing: -0.8px;
+  --type-heading1-size: 32px;
+  --type-heading1-line-height: 38px;
+  --type-heading1-weight: 700;
+  --type-heading1-letter-spacing: -0.64px;
+  --type-heading2-size: 26px;
+  --type-heading2-line-height: 32px;
+  --type-heading2-weight: 650;
+  --type-heading2-letter-spacing: -0.52px;
+  --type-heading3-size: 20px;
+  --type-heading3-line-height: 26px;
+  --type-heading3-weight: 600;
+  --type-heading3-letter-spacing: -0.4px;
+  --type-body-size: 16px;
+  --type-body-line-height: 24px;
+  --type-body-weight: 400;
+  --type-body-letter-spacing: 0px;
+  --type-small-size: 14px;
+  --type-small-line-height: 20px;
+  --type-small-weight: 400;
+  --type-small-letter-spacing: 0px;
+  --type-label-size: 13px;
+  --type-label-line-height: 16px;
+  --type-label-weight: 500;
+  --type-label-letter-spacing: 0px;
+  --type-mono-metadata-size: 12px;
+  --type-mono-metadata-line-height: 16px;
+  --type-mono-metadata-weight: 500;
+  --type-mono-metadata-letter-spacing: 0px;
+
+  --space-4: 4px;
+  --space-8: 8px;
+  --space-12: 12px;
+  --space-16: 16px;
+  --space-24: 24px;
+  --space-32: 32px;
+  --space-48: 48px;
+  --space-64: 64px;
+  --radius-control: 8px;
+  --radius-card: 12px;
+  --radius-dialog: 16px;
+  --radius-button: 9px;
+  --size-control: 44px;
+  --size-control-compact: 40px;
+  --size-reading-width: 68ch;
+  --motion-control: 160ms;
+  --motion-panel: 240ms;
+  --motion-sync-pulse: 1200ms;
+  --profile-game-minimum-viewport-width: 1024px;
+  --profile-game-control-height: 48px;
+  --profile-game-primary-control-height: 58px;
+  --profile-game-reading-text-size: 14px;
+  --profile-game-reading-line-height: 21px;
+  --profile-game-label-text-size: 12px;
+  --profile-game-label-line-height: 16px;
+  --profile-game-disclosure-summary-height: 76px;
+  --profile-game-disclosure-toggle-size: 32px;
+
+  --icon-canvas: 1024px;
+  --icon-square: 840px;
+  --icon-inset: 92px;
+  --icon-radius: 190px;
+  --icon-safe-area: 9%;
+  --icon-gradient: linear-gradient(135deg, #0D0D0D 0%, #3B4145 48%, #899F98 100%);
+}
+
+:root,
+[data-app-stylr-theme="dark"] {
+  --ui-canvas: #0E0E10;
+  --ui-sidebar: #121214;
+  --ui-surface: #151517;
+  --ui-surface-raised: #202023;
+  --ui-border: #2A2A2E;
+  --ui-border-strong: #747479;
+  --ui-text: #F5F4F3;
+  --ui-text-muted: #A7A7AE;
+  --ui-accent: #A9CEC2;
+  --ui-accent-text: #111111;
+  --ui-accent-strong: #C3E3D9;
+  --ui-link: #A9CEC2;
+  --ui-focus: #A9CEC2;
+  --ui-selected: #263D39;
+  --ui-selected-text: #F5F4F3;
+  --ui-success: #82D3A7;
+  --ui-success-surface: #173126;
+  --ui-warning: #F2C46F;
+  --ui-warning-surface: #352B18;
+  --ui-danger: #FF9189;
+  --ui-danger-surface: #38201F;
+  --ui-info: #A9CEC2;
+  --ui-info-surface: #1C302D;
+  color-scheme: dark;
+}
+
+[data-app-stylr-theme="light"] {
+  --ui-canvas: #F7FAF9;
+  --ui-sidebar: #EEF4F2;
+  --ui-surface: #FFFFFF;
+  --ui-surface-raised: #FFFFFF;
+  --ui-border: #D8E4E0;
+  --ui-border-strong: #647B81;
+  --ui-text: #111111;
+  --ui-text-muted: #49545B;
+  --ui-accent: #2E3135;
+  --ui-accent-text: #FFFFFF;
+  --ui-accent-strong: #111111;
+  --ui-link: #315E5A;
+  --ui-focus: #315E5A;
+  --ui-selected: #A9CEC2;
+  --ui-selected-text: #111111;
+  --ui-success: #2F6B4F;
+  --ui-success-surface: #E8F5ED;
+  --ui-warning: #8A5A00;
+  --ui-warning-surface: #FFF4D6;
+  --ui-danger: #A33A32;
+  --ui-danger-surface: #FCEBE9;
+  --ui-info: #315E5A;
+  --ui-info-surface: #E6F2EF;
+  color-scheme: light;
+}
