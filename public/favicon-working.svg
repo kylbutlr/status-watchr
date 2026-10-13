@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" role="img" aria-labelledby="title description">
+  <title id="title">Status Watchr working icon</title>
+  <desc id="description">The default Status Watchr gradient with three white ellipses showing active work.</desc>
+  <defs>
+    <linearGradient id="working-gradient" x1="0" y1="1" x2="1" y2="0">
+      <stop offset="0" stop-color="#0D0D0D" />
+      <stop offset="0.48" stop-color="#3B4145" />
+      <stop offset="1" stop-color="#899F98" />
+    </linearGradient>
+  </defs>
+  <rect x="92" y="92" width="840" height="840" rx="190" fill="url(#working-gradient)" />
+  <g fill="#FFFFFF">
+    <ellipse cx="352" cy="512" rx="48" ry="58" />
+    <ellipse cx="512" cy="512" rx="48" ry="58" />
+    <ellipse cx="672" cy="512" rx="48" ry="58" />
+  </g>
+</svg>

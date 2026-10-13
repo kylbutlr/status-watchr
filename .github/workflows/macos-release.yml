@@ -1,0 +1,170 @@
+name: Publish macOS Sparkle update
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: status-watchr-macos-release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    if: github.ref == 'refs/heads/main'
+    runs-on: macos-26
+    env:
+      NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+      NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+      STATUS_WATCHR_CERTIFICATE_P12_BASE64: ${{ secrets.STATUS_WATCHR_CERTIFICATE_P12_BASE64 }}
+      STATUS_WATCHR_CERTIFICATE_PASSWORD: ${{ secrets.STATUS_WATCHR_CERTIFICATE_PASSWORD }}
+      STATUS_WATCHR_SPARKLE_PRIVATE_KEY: ${{ secrets.STATUS_WATCHR_SPARKLE_PRIVATE_KEY }}
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Validate release secrets
+        shell: bash
+        run: |
+          set -euo pipefail
+          missing=()
+          for name in \
+            NETLIFY_AUTH_TOKEN \
+            NETLIFY_SITE_ID \
+            STATUS_WATCHR_CERTIFICATE_P12_BASE64 \
+            STATUS_WATCHR_CERTIFICATE_PASSWORD \
+            STATUS_WATCHR_SPARKLE_PRIVATE_KEY; do
+            if [[ -z "${!name:-}" ]]; then missing+=("$name"); fi
+          done
+          if (( ${#missing[@]} > 0 )); then
+            printf 'Missing required GitHub Actions secrets: %s\n' "${missing[*]}" >&2
+            exit 1
+          fi
+
+      - name: Prepare trust-independent macOS signing
+        timeout-minutes: 3
+        shell: bash
+        run: |
+          set -euo pipefail
+          rcodesign_version="0.29.0"
+          rcodesign_archive="apple-codesign-$rcodesign_version-macos-universal.tar.gz"
+          rcodesign_sha256="d98372d5524226ccf9dc0eda03d4e4f5826182dabb2fc3f2bd303ed9113a748d"
+          rcodesign_directory="$RUNNER_TEMP/status-watchr-rcodesign"
+          rcodesign_archive_path="$RUNNER_TEMP/$rcodesign_archive"
+          rcodesign_path="$rcodesign_directory/rcodesign"
+          certificate_path="$RUNNER_TEMP/status-watchr-signing.p12"
+          password_path="$RUNNER_TEMP/status-watchr-signing-password.txt"
+
+          echo "Decoding signing certificate."
+          printf '%s' "$STATUS_WATCHR_CERTIFICATE_P12_BASE64" | base64 --decode > "$certificate_path"
+          printf '%s' "$STATUS_WATCHR_CERTIFICATE_PASSWORD" > "$password_path"
+          chmod 600 "$certificate_path" "$password_path"
+
+          echo "Downloading pinned rcodesign $rcodesign_version."
+          curl --fail --silent --show-error --location --retry 3 \
+            "https://github.com/indygreg/apple-platform-rs/releases/download/apple-codesign/$rcodesign_version/$rcodesign_archive" \
+            --output "$rcodesign_archive_path"
+          actual_sha256="$(shasum -a 256 "$rcodesign_archive_path" | awk '{print $1}')"
+          if [[ "$actual_sha256" != "$rcodesign_sha256" ]]; then
+            echo "rcodesign checksum mismatch." >&2
+            exit 1
+          fi
+
+          echo "Extracting verified rcodesign archive."
+          mkdir -p "$rcodesign_directory"
+          tar -xzf "$rcodesign_archive_path" -C "$rcodesign_directory" --strip-components=1
+          "$rcodesign_path" --version
+
+          echo "STATUS_WATCHR_RCODESIGN=$rcodesign_path" >> "$GITHUB_ENV"
+          echo "STATUS_WATCHR_CODESIGN_P12=$certificate_path" >> "$GITHUB_ENV"
+          echo "STATUS_WATCHR_CODESIGN_PASSWORD_FILE=$password_path" >> "$GITHUB_ENV"
+
+      - name: Resolve next patch version
+        id: version
+        shell: bash
+        run: |
+          set -euo pipefail
+          plist="apps/macos/Resources/Info.plist"
+          source_version="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$plist")"
+          published_version="$(curl -fsSL -H 'Cache-Control: no-cache' https://statuswatchr.netlify.app/updates/appcast.xml | sed -n 's|.*<sparkle:shortVersionString>\([^<]*\)</sparkle:shortVersionString>.*|\1|p' | head -n 1)"
+          if [[ -z "$published_version" ]]; then
+            echo "The public Sparkle appcast did not contain a published version." >&2
+            exit 1
+          fi
+          distributed_version="$(< apps/macos/Resources/latest-distributed-version.txt)"
+          version="$(./scripts/next-macos-version.sh "$source_version" "$published_version" "$distributed_version")"
+
+          echo "source=$source_version"
+          echo "published=${published_version:-none}"
+          echo "version=$version"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      - name: Check Swift toolchain
+        shell: bash
+        run: |
+          set -euo pipefail
+          swift_version="$(swift --version | sed -n 's/^Apple Swift version \([0-9.]*\).*/\1/p' | head -n 1)"
+          required_version="$(sed -n 's|^// swift-tools-version: ||p' apps/macos/Package.swift | head -n 1)"
+          version_number() {
+            local major minor patch
+            IFS=. read -r major minor patch <<< "$1"
+            printf '%d%03d%03d' "$major" "${minor:-0}" "${patch:-0}"
+          }
+
+          swift --version
+          xcodebuild -version
+          if [[ -z "$swift_version" || -z "$required_version" ]]; then
+            echo "Unable to determine the installed Swift version or package tools version." >&2
+            exit 1
+          fi
+          if (( $(version_number "$swift_version") < $(version_number "$required_version") )); then
+            echo "The macOS release runner provides Swift $swift_version, but apps/macos/Package.swift requires Swift tools $required_version." >&2
+            exit 1
+          fi
+          echo "Swift $swift_version satisfies package tools version $required_version."
+
+      - name: Resolve dependencies
+        run: |
+          swift package resolve --package-path apps/macos
+          npm ci
+
+      - name: Build and sign release artifacts
+        env:
+          STATUS_WATCHR_VERSION: ${{ steps.version.outputs.version }}
+        run: ./scripts/release-macos-update.sh "${{ steps.version.outputs.version }}"
+
+      - name: Build Netlify site
+        run: npm run build
+
+      - name: Commit and tag release
+        shell: bash
+        run: |
+          set -euo pipefail
+          version="${{ steps.version.outputs.version }}"
+          git config user.name "Kyle Butler"
+          git config user.email "kyle@sdg.la"
+          [[ "$(git var GIT_AUTHOR_IDENT)" == 'Kyle Butler <kyle@sdg.la> '* ]]
+          [[ "$(git var GIT_COMMITTER_IDENT)" == 'Kyle Butler <kyle@sdg.la> '* ]]
+          printf '%s\n' "$version" > apps/macos/Resources/latest-distributed-version.txt
+          git add apps/macos/Resources/Info.plist apps/macos/Resources/latest-distributed-version.txt public/updates
+          git commit -m "Publish macOS $version Sparkle release [skip ci]"
+          git tag -a "v$version" -m "Status Watchr $version"
+          git push --dry-run origin HEAD:refs/heads/main "refs/tags/v$version:refs/tags/v$version"
+          git push --atomic origin HEAD:refs/heads/main "refs/tags/v$version:refs/tags/v$version"
+
+      - name: Deploy production Netlify site
+        run: npx --yes netlify-cli@latest deploy --prod --dir=dist --site="$NETLIFY_SITE_ID" --auth="$NETLIFY_AUTH_TOKEN"
+
+      - name: Verify public Sparkle release
+        shell: bash
+        run: |
+          set -euo pipefail
+          version="${{ steps.version.outputs.version }}"
+          archive="https://statuswatchr.netlify.app/updates/Status-Watchr-$version.zip"
+          feed="https://statuswatchr.netlify.app/updates/appcast.xml"
+          curl -fsSL -H 'Cache-Control: no-cache' "$feed" | grep -F "<sparkle:shortVersionString>$version</sparkle:shortVersionString>"
+          curl -fsSIL "$archive" | grep -E '^HTTP/[0-9.]+ 200'

@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" role="img" aria-labelledby="title description">
+  <title id="title">Status Watchr icon</title>
+  <desc id="description">A charcoal-to-mint rounded square with a white status beacon glyph.</desc>
+  <defs>
+    <linearGradient id="icon-gradient" x1="0" y1="1" x2="1" y2="0">
+      <stop offset="0" stop-color="#0D0D0D" />
+      <stop offset="0.48" stop-color="#3B4145" />
+      <stop offset="1" stop-color="#899F98" />
+    </linearGradient>
+  </defs>
+  <rect x="92" y="92" width="840" height="840" rx="190" fill="url(#icon-gradient)" />
+  <g fill="none" stroke="#FFFFFF" stroke-linecap="round">
+    <path d="M382 372 C294 448 294 576 382 652" stroke-width="58" />
+    <path d="M642 372 C730 448 730 576 642 652" stroke-width="58" />
+    <path d="M292 292 C142 414 142 610 292 732" stroke-width="38" opacity="0.82" />
+    <path d="M732 292 C882 414 882 610 732 732" stroke-width="38" opacity="0.82" />
+  </g>
+  <circle cx="512" cy="512" r="57" fill="#FFFFFF" />
+</svg>

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" role="img" aria-labelledby="title description">
+  <title id="title">Status Watchr finished icon</title>
+  <desc id="description">The default Status Watchr gradient with a white four-point spark glyph.</desc>
+  <defs>
+    <linearGradient id="finished-gradient" x1="0" y1="1" x2="1" y2="0">
+      <stop offset="0" stop-color="#0D0D0D" />
+      <stop offset="0.48" stop-color="#3B4145" />
+      <stop offset="1" stop-color="#899F98" />
+    </linearGradient>
+  </defs>
+  <rect x="92" y="92" width="840" height="840" rx="190" fill="url(#finished-gradient)" />
+  <path d="M512 250C526 402 622 498 774 512C622 526 526 622 512 774C498 622 402 526 250 512C402 498 498 402 512 250Z" fill="#FFFFFF" />
+</svg>

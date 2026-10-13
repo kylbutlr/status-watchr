@@ -1,0 +1,11 @@
+.DS_Store
+node_modules/
+dist/
+.netlify/
+.env
+.env.*
+!.env.example
+apps/macos/.build/
+apps/macos/.swiftpm/
+build/
+*.xcuserstate
