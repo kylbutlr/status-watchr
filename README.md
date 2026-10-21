@@ -65,6 +65,12 @@ Dashboard refresh offers On open / focus, 15 seconds, 30 seconds, 1 minute, or 5
 
 ## Mac companion
 
+### Neon compute budget
+
+The dashboard uses its selected interval as a starting cadence, backing off unchanged snapshots to ten minutes. Returning to the page or receiving changed data restores the starting cadence. Notification settings refresh every ten minutes and on return or explicit interaction; expiry still updates locally.
+
+Collector health is stored in Netlify Blobs without querying Neon. Empty notification retry ticks also stay outside Neon after one bootstrap for existing jobs. Durable receipts preserve delayed and failed delivery recovery. Physical retention runs every six hours while Switchr permits work. See [the compute budget and rollout checks](docs/performance-research.md#compute-budget-update-october-21-2026). These hosted changes require deployment; they do not require a native update or database migration. Savings and real phone delivery remain unverified until rollout.
+
 The [native companion](apps/macos) uses read-only metadata queries as its Desktop observation source. Its separate App Server only inspects hook readiness. Source failure stays unavailable; native monitoring no longer falls back to rollout message files.
 
 Internal Guardian reviews are filtered using Codex's type metadata before discovery limits. ID-only exclusion reports hide previously uploaded reviews and prevent their notifications. This requires migration 007, the updated API, and the native update. See [internal review filtering and rollout](docs/internal-review-filtering.md).

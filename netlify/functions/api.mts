@@ -3,6 +3,9 @@ import { neon } from "@neondatabase/serverless";
 import { notificationAPI } from "./lib/notification-api.js";
 import { notificationIdentity, drainNotifications } from "./lib/notifications.js";
 import { ingestQuestion } from './lib/question-events.js';
+import { questionIdentity } from './lib/question-events.js';
+import { prepareNotificationWake, settleNotificationWake } from './lib/notification-wakes.js';
+import { loadCollectorHealth, saveCollectorHealth } from './lib/collector-health.js';
 import { normalizedIngestEvent } from "./lib/ingest-event.js";
 import {
   clearedSessionCookie,
@@ -94,10 +97,8 @@ async function route(request: Request) {
     if (!hasValidIngestToken(request)) return json({ error: "Ingestion authentication required" }, 401);
     if (!await automaticWorkAllowed()) return json({ error: "Automatic work paused by App Switchr" }, 503, { "retry-after": "30" });
   }
-  const sql = database();
-
   if (path === "/health" && request.method === "GET") {
-    return json({ ok: true, service: "status-watchr", databaseConfigured: Boolean(sql), passwordConfigured: isPasswordConfigured() });
+    return json({ ok: true, service: "status-watchr", databaseConfigured: Boolean(process.env.DATABASE_URL), passwordConfigured: isPasswordConfigured() });
   }
 
   if (path === "/auth/session" && request.method === "GET") {
@@ -120,25 +121,22 @@ async function route(request: Request) {
     return json({ authenticated: false }, 200, { "set-cookie": clearedSessionCookie() });
   }
 
-  if (!sql) return json({ error: "DATABASE_URL is not configured" }, 503);
-
   if (path === "/collector" && request.method === "POST") {
     if (!hasValidIngestToken(request)) return json({ error: "Ingestion authentication required" }, 401);
     const body = await readJson(request);
     if (typeof body.sourceAvailable !== "boolean" || !["trusted", "untrusted", "unknown"].includes(String(body.hookTrust)) ||
         !Number.isInteger(body.queued) || Number(body.queued) < 0 || Number(body.queued) > 5000) return json({ error: "Invalid collector health" }, 400);
-    await sql`insert into collector_health (id, source_available, hook_trust, last_hook_at, queued)
-      values ('mac', ${body.sourceAvailable}, ${String(body.hookTrust)}, ${typeof body.lastHookAt === "string" ? body.lastHookAt : null}::timestamptz, ${Number(body.queued)})
-      on conflict(id) do update set source_available = excluded.source_available, hook_trust = excluded.hook_trust,
-        last_hook_at = excluded.last_hook_at, queued = excluded.queued, received_at = now()`;
+    await saveCollectorHealth(body);
     return json({ accepted: true }, 202);
   }
 
   if (path === "/collector" && request.method === "GET") {
     if (!hasValidSession(request)) return json({ error: "Authentication required" }, 401);
-    const rows = await sql`select source_available, hook_trust, last_hook_at, queued, received_at from collector_health where id = 'mac'`;
-    return json({ collector: rows[0] ?? null });
+    return json({ collector: await loadCollectorHealth() });
   }
+
+  const sql = database();
+  if (!sql) return json({ error: "DATABASE_URL is not configured" }, 503);
 
   if (path === "/notifications" || path.startsWith("/notifications/")) {
     if (!hasValidSession(request)) return json({ error: "Authentication required" }, 401);
@@ -362,8 +360,9 @@ async function route(request: Request) {
       if (excluded.length) return json({ accepted: true, ignored: true }, 202);
       if (String(body.eventType).startsWith('local/question/')) {
         if (process.env.WATCHR_QUESTION_ALERTS_ENABLED !== 'true') return json({ accepted: true, ignored: true }, 202);
+        const wake = await prepareNotificationWake(questionIdentity(body));
         await ingestQuestion(sql, body);
-        try { await drainNotifications(sql); } catch { /* Scheduled retry owns recovery. */ }
+        try { await drainNotifications(sql); await settleNotificationWake(sql, wake); } catch { /* Durable wake owns recovery. */ }
         return json({ accepted: true }, 202);
       }
       const eventId = requiredString(body.eventId, "eventId");
@@ -380,6 +379,7 @@ async function route(request: Request) {
       if (!tones.has(tone)) throw new Error("tone is invalid");
       const notificationId = notificationIdentity(body);
       const parentThreadId = typeof body.parentThreadId === 'string' ? body.parentThreadId : null;
+      const wake = notificationId ? await prepareNotificationWake(notificationId) : null;
 
       const [, inserted] = await sql.transaction([
         sql`
@@ -456,7 +456,7 @@ async function route(request: Request) {
           where conversation_relationships.parent_thread_id <> excluded.parent_thread_id`,
       ]);
       // Queue creation is atomic with ingestion. A failed push does not reject the accepted event.
-      if (notificationId) { try { await drainNotifications(sql); } catch { /* Scheduled retry owns recovery. */ } }
+      if (wake) { try { await drainNotifications(sql); await settleNotificationWake(sql, wake); } catch { /* Durable wake owns recovery. */ } }
       return json({ accepted: true, duplicate: inserted.length === 0 }, 202);
     } catch {
       return json({ error: "Event rejected or storage unavailable" }, 400);

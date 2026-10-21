@@ -61,6 +61,20 @@ This fits the current boundaries: the connector already has lifecycle hooks plus
 4. Keep the Neon read path on the HTTP serverless driver. If session and event writes later need atomic multi-query behavior, Neon supports a non-interactive `transaction()` over HTTP. Use WebSocket `Pool` or `Client` only for a real session/interactive-transaction requirement, and close it inside the Function invocation. Verify whether the deployment connection string should be pooled as concurrency grows, while keeping migrations on a direct connection.
 5. If a future requirement demands realtime push, add a dedicated realtime layer rather than holding a Netlify Function open indefinitely. A Netlify Function can authenticate the browser to a managed provider, following Netlify's documented Ably pattern. The provider should publish an event or invalidation signal, while the browser still performs an authenticated snapshot fetch to reconcile state. This preserves Neon as the source of truth and makes reconnects safe.
 
+## Compute budget update, October 21, 2026
+
+This source update supersedes the selected-interval-only dashboard cadence above. Quiet snapshots back off to ten minutes, resetting on data changes, focus, visibility return, reconnect, and Switchr activation. Error backoff remains separate. Settings refresh every ten minutes and on return or explicit interaction. A local expiry timer still ends temporary notification coverage promptly.
+
+Authenticated collector-health uploads and reads now use the strongly consistent `watchr-collector-health-v1` Blobs store. Existing native clients keep the same API contract. The old Neon table remains intact, without a database fallback that would keep compute awake. Before the first new health report, the dashboard honestly shows unavailable health.
+
+The minute retry function checks the strongly consistent `watchr-notification-wakes-v1` store before opening Neon. An empty or not-yet-due set makes no database request after its one-time bootstrap. Bootstrap recovers pending jobs created by the previous deployment. It is marked complete only after recovery receipts are durable.
+
+Each notification-producing ingestion persists its own opaque receipt before its SQL transaction. No title, final reply, push endpoint, or credential is stored in a receipt. A request killed after commit leaves a receipt eligible after two minutes, beyond the synchronous API execution window. Successful bookkeeping retains only the next pending retry deadline or removes that invocation's receipt. Separate receipts prevent a producer from clearing another's pending work. PostgreSQL still enforces delivery eligibility, attention holds, deduplication, retry leases, and expiry. A Blobs failure rejects new notification-producing ingestion before the transaction, allowing the native outbox to retry. A bookkeeping failure after commit leaves the receipt for recovery.
+
+Retention runs at `00:17`, `06:17`, `12:17`, and `18:17` UTC when Switchr allows work. Age thresholds remain the same; physical deletion may lag the threshold by six hours while On, or longer while Off. Control reads, Blobs operations, genuine lifecycle events, explicit user actions, and pending delivery work still consume resources. Active-run heartbeats still query Neon. This is not a promise that an actively used monitor will sleep.
+
+After an approved hosted deployment, verify real completion and attention notifications, delayed and failed-send recovery, mute/expiry suppression, and Off-to-On behavior. Record each Neon project's plan allowance, compute size, autosuspend configuration, and all active branches. Compare CU-hours per day over 24 hours and seven days, with deliberate quiet On and Off periods. Do not infer billing savings from local native request counts. No migration or native release is required for these hosted changes. Do not roll back to the old health reader and expect it to show the new Blobs check-ins; the next old-client health upload repopulates the old database path after a backend rollback.
+
 ## Sources
 
 Primary sources reviewed on 2026-09-02:

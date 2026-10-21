@@ -152,7 +152,7 @@ function App() {
     if (nextSessions[0]) setSelectedId(nextSessions[0].id);
   };
 
-  const loadLiveSessions = useCallback(async (force = false): Promise<"success" | "failure" | "skipped"> => {
+  const loadLiveSessions = useCallback(async (force = false): Promise<"success" | "unchanged" | "failure" | "skipped"> => {
     if (document.visibilityState === "hidden" || !navigator.onLine) return "skipped";
     refreshController.current?.abort();
     const controller = new AbortController();
@@ -176,7 +176,7 @@ function App() {
       if (response.status === 304) {
         setLastSyncAt(new Date());
         setLiveError(null);
-        return "success";
+        return "unchanged";
       }
       if (!response.ok) throw new Error(`Unable to load live sessions (${response.status})`);
       const payload = await response.json() as {
@@ -327,11 +327,12 @@ function App() {
     let refreshTimer: number | undefined;
     let runGeneration = 0;
     let consecutiveFailures = 0;
+    let unchangedPolls = 0;
     let stopped = false;
 
     const schedule = () => {
       if (stopped || (pollingInterval === 0 && workSwitch.allowed()) || document.visibilityState === "hidden" || !navigator.onLine) return;
-      refreshTimer = window.setTimeout(() => void run(), workSwitch.allowed() ? pollingDelayMs(pollingInterval, consecutiveFailures) : 30_000);
+      refreshTimer = window.setTimeout(() => void run(), workSwitch.allowed() ? pollingDelayMs(pollingInterval, consecutiveFailures, unchangedPolls) : 30_000);
     };
     const run = async () => {
       const generation = ++runGeneration;
@@ -339,11 +340,13 @@ function App() {
       const result = workSwitch.allowed() ? await loadLiveSessions() : "paused";
       if (stopped || generation !== runGeneration) return;
       if (result === "failure") consecutiveFailures += 1;
-      if (result === "success") consecutiveFailures = 0;
+      if (result === "success" || result === "unchanged") consecutiveFailures = 0;
+      unchangedPolls = result === 'unchanged' ? unchangedPolls + 1 : 0;
       schedule();
     };
     const runImmediately = () => {
       if (document.visibilityState !== "visible" || !navigator.onLine) return;
+      unchangedPolls = 0;
       void run();
     };
     const handleVisibilityChange = () => {
