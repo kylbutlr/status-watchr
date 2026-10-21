@@ -102,7 +102,7 @@ export function pushFailureDisposition(error: unknown) {
   return status === 404 || status === 410 ? "revoke" : "retry";
 }
 
-export async function drainNotifications(sql: SQL, send = sendPush) {
+export async function drainNotifications(sql: SQL, send = sendPush, notificationId: string | null = null) {
   if (!pushConfigured()) return;
   // Lease rows atomically across ingestion requests and scheduled retry invocations.
   const jobs = await sql`
@@ -110,6 +110,7 @@ export async function drainNotifications(sql: SQL, send = sendPush) {
     where id in (
       select id from notification_deliveries
       where delivered_at is null and expires_at > now() and attempts < 8
+        and (${notificationId}::text is null or split_part(id, ':', 1) = ${notificationId})
         and next_attempt_at <= now() and (lease_until is null or lease_until < now())
       order by created_at limit 10 for update skip locked
     ) returning id, thread_id, kind, subscription_id, event_occurred_at, reply_preview, created_at, question_request_id

@@ -1,11 +1,14 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { readFileSync, writeFileSync } from "node:fs";
 import { PGlite } from "@electric-sql/pglite";
+import { resetBlobs, getStore, blobFailure } from './blob-fixture';
+import { prepareNotificationWake, retryNotificationWakes, settleNotificationWake } from '../netlify/functions/lib/notification-wakes';
 import type { SQL } from "../netlify/functions/lib/notifications";
 const mock = vi.hoisted(() => ({ sql: undefined as unknown }));
 vi.mock("@neondatabase/serverless", () => ({ neon: () => mock.sql }));
+vi.mock('@netlify/blobs', () => import('./blob-fixture'));
 import handler from "../netlify/functions/api.mts";
-import maintenance from "../netlify/functions/notification-retry.mts";
+import maintenance from "../netlify/functions/retention-scheduled.mts";
 import { createSessionValue } from "../netlify/functions/lib/auth";
 import { drainNotifications, notificationIdentity } from "../netlify/functions/lib/notifications";
 import { normalizedIngestEvent } from '../netlify/functions/lib/ingest-event';
@@ -37,6 +40,7 @@ beforeAll(async () => {
   cookie = `status_watchr_session=${createSessionValue()}`;
 }, 120_000);
 beforeEach(async () => {
+  resetBlobs();
   vi.stubEnv("WATCHR_VAPID_PUBLIC_KEY", "");
   vi.stubEnv("WATCHR_QUESTION_ALERTS_ENABLED", "true");
   await db.exec("update notification_preferences set all_since = null, all_until = null");
@@ -47,6 +51,73 @@ beforeEach(async () => {
 afterAll(async () => { await db.close(); vi.unstubAllEnvs(); });
 
 describe("private ingestion and notifications with embedded PostgreSQL", () => {
+  const wakeStore = () => getStore({ name: 'watchr-notification-wakes-v1' });
+
+  it('does not accept a notification-producing event without durable retry intent', async () => {
+    blobFailure.writes = true;
+    expect((await ingest(event())).status).toBe(400);
+    expect((await db.query('select id from agent_sessions')).rows).toEqual([]);
+    expect((await db.query('select id from notification_deliveries')).rows).toEqual([]);
+    blobFailure.writes = false;
+    expect((await ingest(event())).status).toBe(202);
+    expect((await db.query('select id from notification_deliveries')).rows).toHaveLength(1);
+  });
+
+  it('bootstraps legacy deliveries once, then leaves an empty retry tick off Neon', async () => {
+    await ingest(event());
+    resetBlobs(); // Simulate a delivery created by the previous deployment.
+    const open = vi.fn(() => sql as unknown as SQL);
+    const send = vi.fn().mockResolvedValue(undefined);
+    vi.stubEnv('WATCHR_VAPID_PUBLIC_KEY', 'test'); vi.stubEnv('WATCHR_VAPID_PRIVATE_KEY', 'test'); vi.stubEnv('WATCHR_VAPID_SUBJECT', 'mailto:test@example.com');
+    await retryNotificationWakes(open, send);
+    expect(send).toHaveBeenCalledOnce();
+    expect(open).toHaveBeenCalledOnce();
+    open.mockClear();
+    await retryNotificationWakes(open, send);
+    expect(open).not.toHaveBeenCalled();
+    expect(send).toHaveBeenCalledOnce();
+  });
+
+  it('recovers a commit whose request died before finalizing its wake receipt', async () => {
+    await wakeStore().setJSON('initialized', true);
+    const id = notificationIdentity(event())!;
+    const interrupted = await prepareNotificationWake(id);
+    await ingest(event());
+    const open = vi.fn(() => sql as unknown as SQL);
+    await retryNotificationWakes(open);
+    expect(open).not.toHaveBeenCalled(); // Neither the staged receipt nor the normal short deferral is due.
+    await wakeStore().setJSON(interrupted.key, { ...interrupted, dueAt: 0 });
+    vi.stubEnv('WATCHR_VAPID_PUBLIC_KEY', 'test'); vi.stubEnv('WATCHR_VAPID_PRIVATE_KEY', 'test'); vi.stubEnv('WATCHR_VAPID_SUBJECT', 'mailto:test@example.com');
+    const send = vi.fn().mockResolvedValue(undefined);
+    await retryNotificationWakes(open, send);
+    expect(send).toHaveBeenCalledOnce();
+    expect(await wakeStore().get(interrupted.key)).toBeNull();
+  });
+
+  it('keeps independent producer receipts and honors delayed retries without idle preflights', async () => {
+    await wakeStore().setJSON('initialized', true);
+    await ingest(event());
+    const firstId = notificationIdentity(event())!;
+    const first = await prepareNotificationWake(firstId);
+    const second = await prepareNotificationWake('other-notification');
+    await db.exec("update notification_deliveries set next_attempt_at = now() + interval '5 minutes'");
+    await settleNotificationWake(sql as unknown as SQL, first);
+    const saved = await wakeStore().get(first.key) as { dueAt: number };
+    expect(saved.dueAt).toBeGreaterThan(Date.now() + 290_000);
+    expect(await wakeStore().get(second.key)).not.toBeNull();
+    // Remove only the API's own ready receipt to isolate the future deadline.
+    for await (const page of wakeStore().list({ prefix: 'wakes/' })) {
+      for (const { key } of page.blobs) if (key !== first.key && key !== second.key) await wakeStore().delete(key);
+    }
+    const open = vi.fn(() => sql as unknown as SQL);
+    await retryNotificationWakes(open);
+    expect(open).not.toHaveBeenCalled();
+    await db.exec('delete from notification_deliveries');
+    await settleNotificationWake(sql as unknown as SQL, first);
+    expect(await wakeStore().get(first.key)).toBeNull();
+    expect(await wakeStore().get(second.key)).not.toBeNull();
+  });
+
   it('keeps question alerts independent of work and completion, deduplicates, and cancels matching answers', async () => {
     const question = event({ status: 'working', eventType: 'local/question/opened', attentionId: 'call_fixture:0', eventId: 'question', occurredAt: new Date(Date.now() - 6000).toISOString() });
     await ingest(event({status: 'working', eventType: 'local/task/started', eventId: 'start'}));

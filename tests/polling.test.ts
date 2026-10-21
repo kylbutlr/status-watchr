@@ -21,4 +21,12 @@ describe("dashboard polling", () => {
     expect(pollingDelayMs(30, 3)).toBe(240_000);
     expect(pollingDelayMs(30, 8)).toBe(300_000);
   });
+
+  it('gives unchanged snapshots a sleep window and resets when data changes', () => {
+    expect([0, 1, 2, 3, 4, 5].map(quiet => pollingDelayMs(30, 0, quiet)))
+      .toEqual([30_000, 60_000, 120_000, 240_000, 480_000, 600_000]);
+    expect(pollingDelayMs(30, 0, 100)).toBe(600_000);
+    expect(pollingDelayMs(30)).toBe(30_000);
+    expect(pollingDelayMs(30, 1, 10)).toBe(60_000);
+  });
 });
