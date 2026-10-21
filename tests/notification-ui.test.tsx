@@ -32,6 +32,19 @@ const button = (text: string) => Array.from(container.querySelectorAll("button")
 const render = async (demo = false) => act(async () => { root.render(<NotificationProvider demo={demo}><NotificationOverview demo={demo} /><Notifications threadId="thread" demo={demo} /></NotificationProvider>); });
 
 describe("conversation watch UI", () => {
+  it('does not wake settings every minute or overlap stalled automatic reads', async () => {
+    vi.useFakeTimers();
+    await render();
+    const initial = calls.length;
+    await act(async () => { await vi.advanceTimersByTimeAsync(599_999); });
+    expect(calls).toHaveLength(initial);
+    const fetch = vi.fn(() => new Promise(() => {}));
+    vi.stubGlobal('fetch', fetch);
+    await act(async () => { await vi.advanceTimersByTimeAsync(1); });
+    expect(fetch).toHaveBeenCalledOnce();
+    await act(async () => { window.dispatchEvent(new Event('focus')); });
+    expect(fetch).toHaveBeenCalledOnce();
+  });
   it('starts compact and opens only one control panel at a time', async () => {
     await render();
     const alerts = container.querySelector<HTMLElement>('#alert-settings')!;

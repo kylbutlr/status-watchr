@@ -37,16 +37,18 @@ function useNotificationSettings(demo: boolean, automaticAllowed: () => boolean,
   useEffect(() => {
     if (demo) return;
     let cancelled = false;
+    let inFlight = false;
     const refresh = () => {
       if (document.visibilityState === 'hidden') return;
       // Expiry is local UI state: returning from suspension must not wait for the network.
       setClock(Date.now());
-      if (pending.current || !automaticAllowed()) return;
+      if (pending.current || inFlight || !automaticAllowed() || !navigator.onLine) return;
+      inFlight = true;
       const version = ++revision.current;
-      api().then((result) => { if (!cancelled && version === revision.current) receive(result); }).catch(() => { if (!cancelled && version === revision.current) setMessage("Notification settings unavailable. Open device settings to retry."); });
+      api().then((result) => { if (!cancelled && version === revision.current) receive(result); }).catch(() => { if (!cancelled && version === revision.current) setMessage("Notification settings unavailable. Open device settings to retry."); }).finally(() => { inFlight = false; });
     };
     refresh();
-    const interval = window.setInterval(refresh, 60_000);
+    const interval = window.setInterval(refresh, 600_000);
     window.addEventListener('focus', refresh);
     window.addEventListener('pageshow', refresh);
     document.addEventListener('visibilitychange', refresh);

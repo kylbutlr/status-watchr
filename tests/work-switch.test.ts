@@ -1,8 +1,10 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 const database = vi.hoisted(() => ({ open: vi.fn() }));
 vi.mock("@neondatabase/serverless", () => ({ neon: database.open }));
+vi.mock('@netlify/blobs', () => import('./blob-fixture'));
 import handler from "../netlify/functions/api.mts";
 import maintenance from "../netlify/functions/notification-retry.mts";
+import retention from '../netlify/functions/retention-scheduled.mts';
 import { workPermission } from "../netlify/functions/lib/work-switch";
 import { validPermission } from "../src/work-switch";
 
@@ -39,12 +41,13 @@ describe("App Switchr prevents hosted work before Neon", () => {
       expect(response.headers.get("retry-after")).toBe("30");
     }
     await maintenance();
+    await retention();
     expect(database.open).not.toHaveBeenCalled();
   });
   it("resumes maintenance after On", async () => {
     configured("active"); vi.stubEnv("DATABASE_URL", "postgres://unused");
     database.open.mockReturnValue(vi.fn(async () => []));
-    await maintenance();
+    await retention();
     expect(database.open).toHaveBeenCalledOnce();
   });
   it("fails closed for expired or malformed permission and disallows redirects", async () => {
