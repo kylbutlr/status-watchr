@@ -33,7 +33,7 @@ final class DiagnosticHistory {
     private let retention: TimeInterval = 7 * 86_400
 
     init(directory: URL = FileManager.default.homeDirectoryForCurrentUser
-        .appendingPathComponent("Library/Application Support/Status Watchr/diagnostics"), now: Date = Date()) {
+        .appendingPathComponent("Library/Application Support/Status Watchr Public/diagnostics"), now: Date = Date()) {
         file = directory.appendingPathComponent("history.json")
         do {
             if FileManager.default.fileExists(atPath: file.path) {

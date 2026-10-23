@@ -18,6 +18,6 @@ describe("App Stylr consumer contract", () => {
     expect(styles).toContain("--canvas: var(--ui-canvas);");
     expect(styles).toContain("--accent: var(--ui-accent);");
     expect(exceptions).toContain("Existing local semantic aliases");
-    expect(exceptions).toContain("Google-hosted Geist and Geist Mono");
+    expect(exceptions).toContain("Locally bundled Geist and Geist Mono");
   });
 });

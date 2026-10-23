@@ -193,12 +193,12 @@ final class ConnectorController: ObservableObject {
     }
 
     @Published var state: State = .stopped
-    @Published var siteURL: String = UserDefaults.standard.string(forKey: "siteURL") ?? "https://statuswatchr.netlify.app" {
-        didSet { UserDefaults.standard.set(siteURL, forKey: "siteURL") }
+    @Published var siteURL: String = watchrPreferences.string(forKey: "siteURL") ?? "http://127.0.0.1:4288" {
+        didSet { watchrPreferences.set(siteURL, forKey: "siteURL") }
     }
-    @Published var intervalSeconds: Double = min(60, UserDefaults.standard.object(forKey: "intervalSeconds") as? Double ?? connectorDefaultRecoveryInterval) {
+    @Published var intervalSeconds: Double = min(60, watchrPreferences.object(forKey: "intervalSeconds") as? Double ?? connectorDefaultRecoveryInterval) {
         didSet {
-            UserDefaults.standard.set(intervalSeconds, forKey: "intervalSeconds")
+            watchrPreferences.set(intervalSeconds, forKey: "intervalSeconds")
             if process?.isRunning == true { restartTimer() }
         }
     }
@@ -310,7 +310,7 @@ final class ConnectorController: ObservableObject {
          codexHome: URL = FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent(".codex"),
          attentionStateStore: AttentionStateStore = AttentionStateStore(),
          confirmationDelay: TimeInterval = attentionConfirmationDelay,
-         questionAlertsEnabled: Bool = UserDefaults.standard.bool(forKey: "questionAlertsEnabled"),
+         questionAlertsEnabled: Bool = watchrPreferences.bool(forKey: "questionAlertsEnabled"),
          eventSink: (([String: Any]) -> Void)? = nil) {
         self.diagnostics = diagnostics
         self.previewOnly = previewOnly
@@ -323,7 +323,7 @@ final class ConnectorController: ObservableObject {
         self.eventSink = eventSink
         self.token = previewOnly ? "" : KeychainStore.readToken()
         if previewOnly {
-            _siteURL = Published(initialValue: "https://statuswatchr.netlify.app")
+            _siteURL = Published(initialValue: "http://127.0.0.1:4288")
             workSwitchStatus = "Switchr: On"
             sourceFreshness.observe(available: true, at: Date())
             return
@@ -425,7 +425,7 @@ final class ConnectorController: ObservableObject {
         do {
             try process.run()
             send(method: "initialize", params: [
-                "clientInfo": ["name": "status-watchr-mac", "title": "Status Watchr", "version": "0.1.0"]
+                "clientInfo": ["name": "status-watchr-mac", "title": "Status Watchr", "version": "1.0.0"]
             ], id: 1)
         } catch {
             self.process = nil
@@ -502,7 +502,7 @@ final class ConnectorController: ObservableObject {
             let requestedToken = token
             do {
                 guard let url = URL(string: "\(requestedSite.trimmingCharacters(in: CharacterSet(charactersIn: "/")))/api/work-state"),
-                      url.scheme == "https", url.user == nil, url.password == nil else { throw URLError(.badURL) }
+                      canUseWatchrServer(url) else { throw URLError(.badURL) }
                 var request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 8)
                 request.setValue("Bearer \(requestedToken)", forHTTPHeaderField: "authorization")
                 let (data, response) = try await ConnectionTelemetry.recorder.data(for: request, session: ingestSession, operation: .workState, trigger: .control)
@@ -1272,7 +1272,7 @@ final class ConnectorController: ObservableObject {
     private func drainOutbox() {
         guard isRunning, workLease.allowsWork(), !drainingOutbox, Date() >= deliveryRetryAfter, !token.isEmpty,
               let url = URL(string: "\(siteURL.trimmingCharacters(in: CharacterSet(charactersIn: "/")))/api/events"),
-              url.scheme == "https", url.user == nil, url.password == nil else { return }
+              canUseWatchrServer(url) else { return }
         drainingOutbox = true
         Task {
             defer { drainingOutbox = false }
@@ -1305,7 +1305,7 @@ final class ConnectorController: ObservableObject {
 
     private func sendHealth(sourceAvailable: Bool) {
         guard workLease.allowsWork(), Date().timeIntervalSince(healthSentAt) >= 60, !token.isEmpty,
-              let url = URL(string: "\(siteURL.trimmingCharacters(in: CharacterSet(charactersIn: "/")))/api/collector"), url.scheme == "https" else { return }
+              let url = URL(string: "\(siteURL.trimmingCharacters(in: CharacterSet(charactersIn: "/")))/api/collector"), canUseWatchrServer(url) else { return }
         healthSentAt = Date()
         let body: [String: Any] = [
             "sourceAvailable": sourceAvailable,

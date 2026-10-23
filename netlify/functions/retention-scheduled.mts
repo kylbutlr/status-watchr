@@ -4,6 +4,10 @@ import { neon } from '@neondatabase/serverless';
 export default async function handler() {
   if (!process.env.DATABASE_URL || !await automaticWorkAllowed()) return;
   const sql = neon(process.env.DATABASE_URL);
+  await runRetention(sql);
+}
+
+export async function runRetention(sql: import('./lib/notifications.js').SQL) {
   // Preserve the existing retention rules, in a shared six-hour maintenance window.
   await sql`delete from notification_deliveries where created_at < now() - interval '7 days'`;
   await sql`delete from question_requests where created_at < now() - interval '7 days'`;

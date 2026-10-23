@@ -74,7 +74,7 @@ struct MenuBarView: View {
                 Text("Status Watchr URL")
                     .font(.caption)
                     .foregroundStyle(.secondary)
-                TextField("https://statuswatchr.netlify.app", text: $controller.siteURL)
+                TextField("http://127.0.0.1:4288", text: $controller.siteURL)
                     .textFieldStyle(.roundedBorder)
             }
 

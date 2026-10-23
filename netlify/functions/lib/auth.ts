@@ -52,12 +52,12 @@ export function hasValidSession(request: Request) {
   return isValidSessionValue(sessionValueFromRequest(request));
 }
 
-export function sessionCookie(value: string) {
-  return `${sessionCookieName}=${encodeURIComponent(value)}; Path=/; Max-Age=${sessionLifetimeSeconds}; HttpOnly; SameSite=Strict; Secure`;
+export function sessionCookie(value: string, secure = true) {
+  return `${sessionCookieName}=${encodeURIComponent(value)}; Path=/; Max-Age=${sessionLifetimeSeconds}; HttpOnly; SameSite=Strict${secure ? "; Secure" : ""}`;
 }
 
-export function clearedSessionCookie() {
-  return `${sessionCookieName}=; Path=/; Max-Age=0; HttpOnly; SameSite=Strict; Secure`;
+export function clearedSessionCookie(secure = true) {
+  return `${sessionCookieName}=; Path=/; Max-Age=0; HttpOnly; SameSite=Strict${secure ? "; Secure" : ""}`;
 }
 
 export function hasValidIngestToken(request: Request) {

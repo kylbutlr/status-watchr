@@ -3,7 +3,7 @@ import Foundation
 /// Contains normalized metadata and an optional bounded final-reply preview. Never persist hook input or HTTP response bodies.
 struct EventOutbox {
     let directory: URL
-    init(directory: URL = FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Library/Application Support/Status Watchr/outbox")) {
+    init(directory: URL = FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Library/Application Support/Status Watchr Public/outbox")) {
         self.directory = directory
     }
 

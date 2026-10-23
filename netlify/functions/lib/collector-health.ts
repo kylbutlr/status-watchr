@@ -1,7 +1,7 @@
-import { getStore } from '@netlify/blobs';
+import { watchrStore } from './runtime-store.js';
 import type { CollectorHealth } from '../../../src/collector-health.js';
 
-const store = () => getStore({ name: 'watchr-collector-health-v1', consistency: 'strong' });
+const store = () => watchrStore('watchr-collector-health-v1');
 
 export async function saveCollectorHealth(body: Record<string, unknown>) {
   await store().setJSON('mac', {

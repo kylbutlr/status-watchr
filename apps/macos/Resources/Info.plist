@@ -11,7 +11,7 @@
 	<key>CFBundleIconFile</key>
 	<string>StatusWatchr</string>
 	<key>CFBundleIdentifier</key>
-	<string>com.kylbutlr.statuswatchr</string>
+	<string>com.kylbutlr.statuswatchr.public</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
@@ -19,9 +19,9 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>0.1.44</string>
+	<string>1.0.0</string>
 	<key>CFBundleVersion</key>
-	<string>1044</string>
+	<string>1000000</string>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.productivity</string>
 	<key>LSMinimumSystemVersion</key>
@@ -29,18 +29,6 @@
 	<key>LSUIElement</key>
 	<true/>
 	<key>NSHighResolutionCapable</key>
-	<true/>
-	<key>SUAllowsAutomaticUpdates</key>
-	<true/>
-	<key>SUAutomaticallyUpdate</key>
-	<true/>
-	<key>SUFeedURL</key>
-	<string>https://statuswatchr.netlify.app/updates/appcast.xml</string>
-	<key>SUPublicEDKey</key>
-	<string>cl9BruHilKOKePmNL4z//WabakBp+g0fvyLa4zqrwq0=</string>
-	<key>SURequireSignedFeed</key>
-	<true/>
-	<key>SUVerifyUpdateBeforeExtraction</key>
 	<true/>
 </dict>
 </plist>

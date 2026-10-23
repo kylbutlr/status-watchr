@@ -284,8 +284,8 @@ export const demoSessions: AgentSession[] = [
   {
     id: "session-01",
     title: "Audit collection filter behavior",
-    repo: "browns-shopify",
-    branch: "kylebutler/sc-494874/visual-chips",
+    repo: "fieldnotes-storefront",
+    branch: "demo/collection-filters",
     status: "working",
     statusLabel: "Working",
     statusDetail: "Running browser checks",
@@ -300,8 +300,8 @@ export const demoSessions: AgentSession[] = [
   {
     id: "session-02",
     title: "Review the release checklist",
-    repo: "app-stylr",
-    branch: "kylebutlr/release-check",
+    repo: "component-library",
+    branch: "demo/release-check",
     status: "needs_you",
     statusLabel: "Needs you",
     statusDetail: "Waiting on command approval",
@@ -316,8 +316,8 @@ export const demoSessions: AgentSession[] = [
   {
     id: "session-03",
     title: "Reconcile this week’s activity",
-    repo: "harvest-trackr",
-    branch: "kylebutler/activity-reconcile",
+    repo: "project-notes",
+    branch: "demo/activity-review",
     status: "finished",
     statusLabel: "Finished",
     statusDetail: "Completed successfully",
@@ -332,8 +332,8 @@ export const demoSessions: AgentSession[] = [
   {
     id: "session-04",
     title: "Check webhook callback contract",
-    repo: "janus-concierge",
-    branch: "kylebutler/sc-494886/callback-contract",
+    repo: "demo-service",
+    branch: "demo/webhook-contract",
     status: "failed",
     statusLabel: "Failed",
     statusDetail: "Needs a client-provided example",
@@ -341,7 +341,7 @@ export const demoSessions: AgentSession[] = [
     elapsed: "11m",
     events: [
       { id: "e-10", label: "Turn failed", detail: "Expected callback example was not available", occurredAt: "1h ago", tone: "danger" },
-      { id: "e-11", label: "Input requested", detail: "Waiting for the D365 payload contract", occurredAt: "1h ago", tone: "attention" },
+      { id: "e-11", label: "Input requested", detail: "Waiting for the example payload contract", occurredAt: "1h ago", tone: "attention" },
       { id: "e-12", label: "Turn started", detail: "Check inbound callback contract", occurredAt: "1h ago", tone: "quiet" },
     ],
   },
