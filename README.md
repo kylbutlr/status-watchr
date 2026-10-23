@@ -71,7 +71,7 @@ information and may appear on a phone lock screen. Do not publish your data
 directory, native queue, secrets, or database backups. The observer does not
 provide remote-control endpoints or upload raw prompts and tool arguments.
 
-Geist fonts and App Stylr assets are bundled locally. Web Push uses the browser's
+Geist fonts and [App Stylr v1.2.0 assets](https://github.com/kylbutlr/app-stylr/tree/b3ca31ea264d5dd233fd871ac167247f1c306985) are bundled locally. Web Push uses the browser's
 push service only after you opt in. See [privacy and security](docs/privacy.md).
 
 ## Development

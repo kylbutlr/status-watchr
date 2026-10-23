@@ -1,15 +1,15 @@
 import Foundation
 
 enum CodexHookInstaller {
-    static let command = "/usr/bin/curl --silent --max-time 1 --output /dev/null --header 'Content-Type: application/json' --data-binary @- http://127.0.0.1:48731/codex-hook"
-    static let legacyCommand = "/usr/bin/curl --silent --show-error --max-time 1 --output /dev/null --data-binary @- http://127.0.0.1:48731/codex-hook"
+    static let command = "/usr/bin/curl --silent --max-time 1 --output /dev/null --header 'Content-Type: application/json' --data-binary @- http://127.0.0.1:48732/codex-hook"
+    static let legacyCommand = "/usr/bin/curl --silent --show-error --max-time 1 --output /dev/null --data-binary @- http://127.0.0.1:48732/codex-hook"
     static let eventNames = ["UserPromptSubmit", "PermissionRequest", "PostToolUse", "Stop", "Interrupt", "SubagentStart", "SubagentStop"]
 
-    private static var hooksURL: URL {
+    static var defaultHooksURL: URL {
         URL(fileURLWithPath: NSHomeDirectory()).appendingPathComponent(".codex/hooks.json")
     }
 
-    static func isInstalled() -> Bool {
+    static func isInstalled(at hooksURL: URL = defaultHooksURL) -> Bool {
         guard let data = try? Data(contentsOf: hooksURL),
               let root = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
               let hooks = root["hooks"] as? [String: Any] else { return false }
@@ -19,8 +19,8 @@ enum CodexHookInstaller {
         }
     }
 
-    static func install() throws {
-        var root = try readRoot()
+    static func install(at hooksURL: URL = defaultHooksURL) throws {
+        var root = try readRoot(at: hooksURL)
         var hooks = root["hooks"] as? [String: Any] ?? [:]
         for eventName in eventNames {
             var groups = hooks[eventName] as? [[String: Any]] ?? []
@@ -45,11 +45,11 @@ enum CodexHookInstaller {
             hooks[eventName] = groups
         }
         root["hooks"] = hooks
-        try writeRoot(root)
+        try writeRoot(root, at: hooksURL)
     }
 
-    static func remove() throws {
-        var root = try readRoot()
+    static func remove(at hooksURL: URL = defaultHooksURL) throws {
+        var root = try readRoot(at: hooksURL)
         guard var hooks = root["hooks"] as? [String: Any] else { return }
         for eventName in eventNames {
             guard let groups = hooks[eventName] as? [[String: Any]] else { continue }
@@ -64,7 +64,7 @@ enum CodexHookInstaller {
             else { hooks[eventName] = remaining }
         }
         root["hooks"] = hooks
-        try writeRoot(root)
+        try writeRoot(root, at: hooksURL)
     }
 
     private static func containsCommand(_ group: [String: Any]) -> Bool {
@@ -72,7 +72,7 @@ enum CodexHookInstaller {
         return handlers.contains { $0["type"] as? String == "command" && $0["command"] as? String == command }
     }
 
-    private static func readRoot() throws -> [String: Any] {
+    private static func readRoot(at hooksURL: URL) throws -> [String: Any] {
         guard FileManager.default.fileExists(atPath: hooksURL.path) else { return [:] }
         let data = try Data(contentsOf: hooksURL)
         guard let root = try JSONSerialization.jsonObject(with: data) as? [String: Any] else {
@@ -81,7 +81,7 @@ enum CodexHookInstaller {
         return root
     }
 
-    private static func writeRoot(_ root: [String: Any]) throws {
+    private static func writeRoot(_ root: [String: Any], at hooksURL: URL) throws {
         let directory = hooksURL.deletingLastPathComponent()
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
         let data = try JSONSerialization.data(withJSONObject: root, options: [.prettyPrinted, .sortedKeys])

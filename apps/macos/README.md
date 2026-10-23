@@ -35,3 +35,5 @@ There is no prebuilt, notarized, or automatically updated Mac binary in v1.0.0.
 A public signed-app channel would be a separate release with its own validation.
 Read [self-hosting](../../docs/self-hosting.md) and [privacy](../../docs/privacy.md)
 before configuring phone alerts or optional hooks.
+
+Public source builds use loopback hook port `48732`, separate from the private pilot's `48731`. Installing or removing public hooks preserves the private handlers.
