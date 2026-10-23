@@ -77,17 +77,24 @@ generate_appcast_args=(
     --maximum-deltas 0
 )
 
+# Generate in disposable storage: Sparkle may move older archives into
+# old_updates when limiting the feed. Keep every published ZIP at its original
+# download URL, independently of the number of versions advertised in the feed.
+feed_directory="$staging_directory/feed"
+mkdir -p "$feed_directory"
+cp "$updates_directory/"*.zip "$feed_directory/"
+
 if [[ -n "${STATUS_WATCHR_SPARKLE_PRIVATE_KEY:-}" ]]; then
     printf '%s' "$STATUS_WATCHR_SPARKLE_PRIVATE_KEY" |
-        "$sparkle_tools/generate_appcast" --ed-key-file - "${generate_appcast_args[@]}" "$updates_directory"
+        "$sparkle_tools/generate_appcast" --ed-key-file - "${generate_appcast_args[@]}" "$feed_directory"
 else
     "$sparkle_tools/generate_appcast" \
         --account com.kylbutlr.statuswatchr \
         "${generate_appcast_args[@]}" \
-        "$updates_directory"
+        "$feed_directory"
 fi
 
-rm -rf -- "$updates_directory/old_updates"
+cp "$feed_directory/appcast.xml" "$updates_directory/appcast.xml"
 
 echo "Prepared Status Watchr $version (build $build_number)."
 echo "Archive: $archive_path"
