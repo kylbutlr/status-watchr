@@ -80,16 +80,25 @@ async function readJson(request: Request) {
   return value;
 }
 
-export default async function handler(request: Request) {
-  try { return await route(request); }
-  catch { return json({ error: "Service unavailable. Try again shortly." }, 503); }
+type HandlerOptions = {
+  database?: typeof database;
+  hasSession?: typeof hasValidSession;
+  secureCookies?: boolean;
+  databaseConfigured?: boolean;
+};
+export function createHandler(options: HandlerOptions = {}) {
+  return async (request: Request) => {
+    try { return await route(request, options); }
+    catch { return json({ error: "Service unavailable. Try again shortly." }, 503); }
+  };
 }
+export default createHandler();
 
-async function route(request: Request) {
+async function route(request: Request, { database: openDatabase = database, hasSession = hasValidSession, secureCookies = true, databaseConfigured = Boolean(process.env.DATABASE_URL) }: HandlerOptions) {
   const requestUrl = new URL(request.url);
   const path = requestUrl.pathname.replace(/^\/api/, "") || "/health";
   if (path === "/work-state" && request.method === "GET") {
-    if (!hasValidSession(request) && !hasValidIngestToken(request)) return json({ error: "Authentication required" }, 401);
+    if (!hasSession(request) && !hasValidIngestToken(request)) return json({ error: "Authentication required" }, 401);
     return json(await workPermission());
   }
   // Reject unacknowledged automatic uploads before opening Neon. The native outbox retains them.
@@ -98,11 +107,11 @@ async function route(request: Request) {
     if (!await automaticWorkAllowed()) return json({ error: "Automatic work paused by App Switchr" }, 503, { "retry-after": "30" });
   }
   if (path === "/health" && request.method === "GET") {
-    return json({ ok: true, service: "status-watchr", databaseConfigured: Boolean(process.env.DATABASE_URL), passwordConfigured: isPasswordConfigured() });
+    return json({ ok: true, service: "status-watchr", databaseConfigured, passwordConfigured: isPasswordConfigured() });
   }
 
   if (path === "/auth/session" && request.method === "GET") {
-    return json({ authenticated: hasValidSession(request), passwordConfigured: isPasswordConfigured() });
+    return json({ authenticated: hasSession(request), passwordConfigured: isPasswordConfigured(), authenticationMode: secureCookies ? "password" : process.env.WATCHR_AUTH_MODE || "password" });
   }
 
   if (path === "/auth/login" && request.method === "POST") {
@@ -111,14 +120,14 @@ async function route(request: Request) {
       const password = requiredString(body.password, "password");
       if (!isPasswordConfigured()) return json({ error: "Access credentials are not configured" }, 503);
       if (!verifyAccessPassword(password)) return json({ error: "Incorrect password" }, 401);
-      return json({ authenticated: true }, 200, { "set-cookie": sessionCookie(createSessionValue()) });
+      return json({ authenticated: true }, 200, { "set-cookie": sessionCookie(createSessionValue(), secureCookies) });
     } catch {
       return json({ error: "Invalid login request" }, 400);
     }
   }
 
   if (path === "/auth/logout" && request.method === "POST") {
-    return json({ authenticated: false }, 200, { "set-cookie": clearedSessionCookie() });
+    return json({ authenticated: false }, 200, { "set-cookie": clearedSessionCookie(secureCookies) });
   }
 
   if (path === "/collector" && request.method === "POST") {
@@ -131,20 +140,20 @@ async function route(request: Request) {
   }
 
   if (path === "/collector" && request.method === "GET") {
-    if (!hasValidSession(request)) return json({ error: "Authentication required" }, 401);
+    if (!hasSession(request)) return json({ error: "Authentication required" }, 401);
     return json({ collector: await loadCollectorHealth() });
   }
 
-  const sql = database();
+  const sql = openDatabase();
   if (!sql) return json({ error: "DATABASE_URL is not configured" }, 503);
 
   if (path === "/notifications" || path.startsWith("/notifications/")) {
-    if (!hasValidSession(request)) return json({ error: "Authentication required" }, 401);
+    if (!hasSession(request)) return json({ error: "Authentication required" }, 401);
     return notificationAPI(request, path, sql);
   }
 
   if (path === "/sessions" && request.method === "GET") {
-    if (!hasValidSession(request)) return json({ error: "Authentication required" }, 401);
+    if (!hasSession(request)) return json({ error: "Authentication required" }, 401);
     const requestedStatus = requestUrl.searchParams.get("status") ?? "all";
     if (requestedStatus !== "all" && !statuses.has(requestedStatus)) return json({ error: "Invalid session status" }, 400);
     const cursorValue = requestUrl.searchParams.get("cursor");
@@ -279,7 +288,7 @@ async function route(request: Request) {
 
   const sessionEventsMatch = /^\/sessions\/([^/]+)\/events$/.exec(path);
   if (sessionEventsMatch && request.method === "GET") {
-    if (!hasValidSession(request)) return json({ error: "Authentication required" }, 401);
+    if (!hasSession(request)) return json({ error: "Authentication required" }, 401);
     let sessionId: string;
     try {
       sessionId = decodeURIComponent(sessionEventsMatch[1]);

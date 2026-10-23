@@ -26,6 +26,7 @@ function StatusDot({ status }: { status: AgentStatus }) {
 }
 
 function App() {
+  const [passwordless, setPasswordless] = useState(false);
   const isLocalDemo = import.meta.env.DEV && import.meta.env.VITE_WATCHR_LIVE !== "true";
   const [previewCheckInAt] = useState(() => new Date(Date.now() - 120_000).toISOString());
   const [authState, setAuthState] = useState<"checking" | "signed_out" | "signed_in">(isLocalDemo ? "signed_in" : "checking");
@@ -317,7 +318,8 @@ function App() {
   useEffect(() => {
     if (isLocalDemo) return;
     fetch("/api/auth/session").then(async (response) => {
-      const result = await response.json() as { authenticated?: boolean };
+      const result = await response.json() as { authenticated?: boolean; authenticationMode?: string };
+      setPasswordless(result.authenticationMode === "none");
       setAuthState(result.authenticated ? "signed_in" : "signed_out");
     }).catch(() => setAuthState("signed_out"));
   }, [isLocalDemo]);
@@ -407,8 +409,8 @@ function App() {
           <span>status <strong>watchr</strong></span>
         </a>
         <div className="topbar-meta">
-          <span className="private-pill"><span className="tiny-lock">●</span> Private</span>
-          <button className="avatar" type="button" aria-label="Sign out" onClick={handleLogout}>kb</button>
+          <span className="private-pill"><span className="tiny-lock">●</span> {passwordless ? "Local" : "Private"}</span>
+          {!passwordless && <button className="avatar" type="button" aria-label="Sign out" onClick={handleLogout}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" aria-hidden="true"><path d="M9 4H4v16h5M14 8l4 4-4 4M8 12h10" /></svg></button>}
         </div>
       </header>
 

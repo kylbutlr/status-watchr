@@ -9,7 +9,7 @@ struct PendingAttention: Codable, Equatable {
 
 struct AttentionStateStore {
     let directory: URL
-    init(directory: URL = FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Library/Application Support/Status Watchr")) {
+    init(directory: URL = FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Library/Application Support/Status Watchr Public")) {
         self.directory = directory
     }
     private var file: URL { directory.appendingPathComponent("attention.json") }

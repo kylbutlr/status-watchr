@@ -1,98 +1,94 @@
 # Status Watchr
 
-A private Mac-to-iPhone activity monitor for coding work started in the Desktop App.
+Backup alerts for the coding-agent conversations you choose to watch.
 
-This branch implements a completion-first personal monitoring path. The private web pilot is deployed. The owner reported successful phone test and watched-completion notifications; physical iPhone verification of temporary all-conversation alerts remains pending. Private Mac build 0.1.15 / 1015 is installed, and its repaired task tracking was verified through the live dashboard. Complete attention/question detection remains unresolved. See the [identity repair checkpoint](docs/history-identity-repair.md), [temporary-alert verification boundaries](docs/temporary-alerts.md), and [earlier rollout record](docs/pilot-rollout-2026-09-20.md). The earlier public multi-provider product expansion is paused.
+Status Watchr is a self-hosted dashboard and macOS observer for Codex Desktop
+activity. Watch a conversation, leave the desk, and receive an optional phone
+notification when a confirmed run finishes or fails. It supplements the agent
+app's own notifications; it does not guarantee that every question, approval,
+or completion will be detected or delivered.
 
-## What this slice does
+[Downloads](https://github.com/kylbutlr/status-watchr/releases) ·
+[Self-hosting](docs/self-hosting.md) ·
+[Mac companion](apps/macos/README.md) ·
+[Report an issue](https://github.com/kylbutlr/status-watchr/issues)
 
-An optional [question-alert trial](docs/question-alert-trial.md) is prepared locally and disabled by default. It separates structured async question requests from run status, holds alerts for five seconds, and clears matching structured answers. Native and hosted activation, a signed app update, and end-to-end phone verification are separate rollout steps.
+## Run locally
 
-- Reads explicit conversation and run metadata from the Mac's local Codex SQLite projections without starting or resuming tasks.
-- Checks known runs every five seconds, discovers up to 100 recent unarchived conversations every 15 to 60 seconds, and recovers recent completed runs between checks.
-- Holds completion events for at least five seconds, then rereads local inventory and turn history before enabling a completion alert. A resumed follow-up preserves the earlier completion in history without a phone alert; unavailable metadata waits for confirmation. Hosted dispatch also drops pending completions superseded by a newer run. These source changes require a native release and hosted deployment before they affect the installed pilot.
-- Checks subtask parent relationships during completion confirmation. A finished child stays quiet while a parent or ancestor is still running or cannot be confirmed idle. Parent completions keep their normal five-second confirmation. This additional native source change requires a companion update.
-- Separates local-source availability, hook trust, observed hook execution, and pending delivery from a successful dashboard refresh.
-- Queues normalized events on disk for network recovery.
-- Persists optional conversation watches across subsequent runs until muted.
-- Adds temporary all-conversation alerts for 15 minutes, 1 hour, or 4 hours without changing individual watches. Live in the private pilot with migration 005; physical iPhone verification for this mode remains pending.
-- Sends optional completion and failure notifications with the watched conversation title and a short final-reply preview when available. Attention delivery remains experimental: ambiguous approval hooks and generic waiting flags no longer trigger a “Needs you” alert. Test alerts remain generic.
-- Includes an iPhone Home Screen manifest, push-only service worker, explicit device opt-in, test notification, and revocation.
-- Exposes no remote commands, replies, or approval controls.
+Requires Node.js 24 or newer. Extract the server download into its own directory:
 
-“In progress” is not proof of active computation. A finished run is not proof that the assignment is complete. Questions are not reliably detected. Multiple simultaneous approval requests remain ambiguous without a unique source request ID.
+```sh
+npm ci --omit=dev
+npm run start:local
+```
 
-Read [the architecture, privacy boundary, threat model, retention rules, and setup guide](docs/personal-monitor.md) and [the readiness report](docs/personal-monitor-readiness.md) before installing or deploying this branch.
+Open [Status Watchr](http://127.0.0.1:4288/). This explicitly selects passwordless
+loopback access. The server creates its own persistent embedded database and
+owner-readable local secrets under `data/`. No Netlify account, Neon database,
+App Switchr installation, or managed hosting account is required.
 
-## App Switchr
+Stop the server with Ctrl+C in that terminal. Keep the data directory private and
+retain it when upgrading. A missing password never silently turns authentication
+off: `npm start` requires a configured password; `start:local` is the explicit
+local choice. See [optional passwords and remote access](docs/self-hosting.md).
 
-The optional [App Switchr integration](docs/app-switchr.md) pauses automatic cloud work. A confirmed Off also pauses the Mac's local observation until On resumes it; an unavailable permission keeps local capture but still blocks uploads. Source changes require a separate hosted and native rollout.
+## What it does
 
-## Local development and verification
+- Observe local Codex conversation and run metadata without starting, resuming,
+  replying to, or approving agent work.
+- Persist watches across subsequent runs of a selected conversation.
+- Confirm completion before making an alert eligible, including parent/child
+  relationships and resumed work that can supersede an earlier completion.
+- Queue normalized events locally when the server cannot be reached.
+- Offer opt-in Web Push subscriptions, a generic test alert, device revocation,
+  and visible notification coverage controls.
+- Keep source availability, queued delivery, and observed status distinct so a
+  successful dashboard refresh is not mistaken for successful monitoring.
+
+Question and attention detection remains experimental. Codex's local metadata
+schemas can change, and unavailable data must remain unavailable rather than be
+guessed. Use this as a secondary signal, not an emergency or unattended-work
+completion guarantee.
+
+## Mac companion and phone alerts
+
+The Mac companion is **source-only** in v1.0.0. Build it with Swift 6.2 or newer
+on macOS 14 or newer. There is no prebuilt or notarized Mac download and no public
+Sparkle update feed. Source builds use manual updates and do not install over an
+existing app. The separate observer ingestion credential is not a dashboard
+password. Follow [the Mac setup guide](apps/macos/README.md).
+
+For an iPhone, the server must be reachable through an HTTPS origin you control.
+Add the dashboard to the Home Screen, explicitly enable its notification device,
+and test delivery. An HTTP loopback URL on your phone refers to the phone itself,
+not the Mac. Local-only use does not require a domain or reverse proxy; phone
+access does. The release does not provision that infrastructure for you.
+
+## Privacy
+
+Conversation titles and optional final-reply excerpts can contain private
+information and may appear on a phone lock screen. Do not publish your data
+directory, native queue, secrets, or database backups. The observer does not
+provide remote-control endpoints or upload raw prompts and tool arguments.
+
+Geist fonts and App Stylr assets are bundled locally. Web Push uses the browser's
+push service only after you opt in. See [privacy and security](docs/privacy.md).
+
+## Development
 
 ```sh
 npm ci
-npm run dev
 npm run typecheck
 npm test
-npm run build
+npm run build:standalone
+npm run package
 cd apps/macos
 swift test
 ```
 
-Vite development uses explicitly labeled demo data. The notification controls do not send requests in demo mode. For an intentionally configured local backend, set `VITE_WATCHR_LIVE=true` and run the documented Netlify development command, `npm run netlify:dev`. Never prefix secrets with `VITE_`.
+The package command writes a standalone server archive, a clean source archive,
+and SHA-256 checksums under `releases/`. These exclude personal rollout history,
+old native update binaries, credentials, and real activity data. Local tests use
+disposable data, not the installed private pilot or its hosted database.
 
-The Node tests include embedded PostgreSQL tests of the migrations and real ingestion/notification queries. They do not use production Neon or send real push notifications. The native tests cover read-only projection parsing, hook trust, hook payload stripping, and persistent offline queue/attention state.
-
-Read-only diagnostics:
-
-```sh
-node scripts/probe-desktop-activity.mjs --thread YOUR_CONVERSATION_UUID --expect-active --require-completed-history
-CODEX_BIN=/Applications/ChatGPT.app/Contents/Resources/codex node scripts/probe-codex-hooks.mjs
-```
-
-The first selects lifecycle columns only. The second starts its own read-only App Server for hook inventory, then stops that diagnostic process. It neither trusts hooks nor starts agent work. Passing these checks does not establish phone delivery.
-
-## Private hosted setup
-
-The existing single-owner password cookie and separate ingest token remain in place. This is not public SaaS authentication or tenant isolation.
-
-Apply [migrations 001 through 006](database/migrations) in order only after approval and backup. The existing private deployment has 005; migration 006 is required before deploying reply previews. [Temporary-alert rollout evidence](docs/temporary-alerts.md) records the earlier additive upgrade and remaining phone checks. Configure server secrets from [.env.example](.env.example), including VAPID keys for push. Deploying the scheduled retry function activates physical retention deletion, not just dashboard filtering. See the setup sequence and deletion boundaries in [the personal monitor guide](docs/personal-monitor.md).
-
-The dashboard source offers temporary all-conversation alerts at the top, persistent per-conversation Watch/Mute, and notification-device controls. On narrow screens, selecting a conversation opens its details immediately; Back to conversations restores list position. On iPhone, add the site to the Home Screen, open it there, explicitly enable notifications, and test delivery before relying on it. [WebKit platform requirements](https://webkit.org/blog/13878/web-push-for-web-apps-on-ios-and-ipados/).
-
-Dashboard refresh offers On open / focus, 15 seconds, 30 seconds, 1 minute, or 5 minutes. New settings default to 30 seconds; existing supported choices remain unchanged. Saved 2-minute settings migrate to 1 minute, and saved 15-, 30-, or 60-minute settings migrate to 5 minutes, matching the previous scheduler cap for those longer choices. Dashboard refresh does not control push delivery or the Mac observer's polling interval. General notification coverage help is inside Notification device settings; active expiry and Always on status remain visible above it.
-
-## Mac companion
-
-### Neon compute budget
-
-The dashboard uses its selected interval as a starting cadence, backing off unchanged snapshots to ten minutes. Returning to the page or receiving changed data restores the starting cadence. Notification settings refresh every ten minutes and on return or explicit interaction; expiry still updates locally.
-
-Collector health is stored in Netlify Blobs without querying Neon. Empty notification retry ticks also stay outside Neon after one bootstrap for existing jobs. Durable receipts preserve delayed and failed delivery recovery. Physical retention runs every six hours while Switchr permits work. See [the compute budget and rollout checks](docs/performance-research.md#compute-budget-update-october-21-2026). These hosted changes require deployment; they do not require a native update or database migration. Savings and real phone delivery remain unverified until rollout.
-
-The [native companion](apps/macos) uses read-only metadata queries as its Desktop observation source. Its separate App Server only inspects hook readiness. Source failure stays unavailable; native monitoring no longer falls back to rollout message files.
-
-Internal Guardian reviews are filtered using Codex's type metadata before discovery limits. ID-only exclusion reports hide previously uploaded reviews and prevent their notifications. This requires migration 007, the updated API, and the native update. See [internal review filtering and rollout](docs/internal-review-filtering.md).
-
-Codex hooks are optional and require review of their exact definitions. Installation alone does not mean they can execute. The revised installer preserves unrelated hook handlers and the existing Codex `notify` command. See [Codex hook trust documentation](https://learn.chatgpt.com/docs/hooks#review-and-trust-hooks).
-
-Raw hook stdin can contain sensitive content. It stays on loopback and is stripped at the receiver before callbacks or persistence. Hosted activity contains approved conversation titles and normalized status metadata. For a recent completed turn, the Mac companion can read the final agent answer and attach a bounded excerpt to the notification job and encrypted Web Push payload. It does not collect prompts, tool arguments, terminal output, diffs, or raw error messages. Titles and final replies can contain sensitive client information and may appear on the phone lock screen. See [notification preview rollout](docs/notification-reply-preview.md).
-
-The [legacy command-line collector](collector/status-watchr.mjs) remains compatibility/diagnostic code, not the recommended always-on path. It does not have the native observer's disk queue or readiness reporting.
-
-Unnamed subagents are labeled from their existing parent conversation and subtask metadata, for example `Project task: performance review`. Title changes can sync after a run finishes without generating another lifecycle event or completion alert. A separate bounded title-only repair corrects retained finished subagents outside the 100-conversation discovery window, including archived subtasks. Hosted ingestion preserves known names when an older collector sends a placeholder. See [conversation title repair and rollout gates](docs/conversation-title-repair.md). These changes require an approved web deployment and native release before they affect the installed pilot.
-
-The dashboard groups subtasks under their highest retained parent using structured Codex IDs, with subtask activity in the parent's log. Counts and pagination apply to the grouped rows. Existing retained subtasks are backfilled without replaying completions; identical titles alone never merge conversations. This requires migration 008, an approved hosted deployment and a native update. See [conversation grouping and rollout gates](docs/conversation-grouping.md).
-
-## Release and signing safety
-
-Integration is `origin/main`. Work belongs on an isolated `kylebutler/` feature branch without tracking main.
-
-The existing [manual macOS release workflow](.github/workflows/macos-release.yml) signs and publishes Sparkle artifacts, commits release assets, tags a release, and deploys production Netlify. Do not use it to test this branch. Source changes do not update the installed app.
-
-Before any authorized native installation or publication, verify the source/base, monotonically increasing bundle version, code-signing identity and signature, notarization, Sparkle signature, and rollback path. Keep signing and VAPID private keys out of Git and chat. No push, PR, production migration, deployment, native installation/release, or public repository change is implied by local development.
-
-## App Stylr
-
-Pinned to [App Stylr v1.2.0 source](https://github.com/kylbutlr/app-stylr/tree/b3ca31ea264d5dd233fd871ac167247f1c306985). The existing Evening palette, semantic tokens, and product layout are preserved. See [the adoption note](docs/app-stylr-evening-adoption.md) and [implementation exceptions](docs/app-stylr-exceptions.md).
+Created by [Kyle Butler](https://kylbutlr.com). [MIT license](LICENSE).

@@ -1,9 +1,9 @@
 import { randomUUID } from 'node:crypto';
-import { getStore } from '@netlify/blobs';
+import { watchrStore } from './runtime-store.js';
 import { drainNotifications, sendPush, type SQL } from './notifications.js';
 
 type Wake = { key: string; notificationId: string; dueAt: number };
-const store = () => getStore({ name: 'watchr-notification-wakes-v1', consistency: 'strong' });
+const store = () => watchrStore('watchr-notification-wakes-v1');
 const prefix = 'wakes/';
 const pendingQuery = (sql: SQL, notificationId: string | null) => sql`
   select split_part(id, ':', 1) as notification_id,

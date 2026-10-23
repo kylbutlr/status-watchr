@@ -9,3 +9,7 @@ apps/macos/.build/
 apps/macos/.swiftpm/
 build/
 *.xcuserstate
+
+data/
+releases/
+outputs/
