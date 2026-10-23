@@ -17,9 +17,9 @@ conversations, and notification devices stay under your control.
 ## Availability
 
 Versioned server and source archives are distributed through GitHub Releases,
-with file manifests and SHA-256 checksums. The original web/server v1.0.0 release
-includes Mac source. The signed **macOS v1.0.0** update is being prepared as a
-separate native release; it is not included in the earlier server download.
+with file manifests and SHA-256 checksums. Signed Mac downloads use a separate
+native release channel and are not included in the server archive. See the
+[Mac companion guide](apps/macos/README.md) for installation and updates.
 
 | Component | Requirements | Installation |
 | --- | --- | --- |

@@ -1,15 +1,16 @@
 # Status Watchr Mac companion
 
 A menu-bar observer for selected Codex Desktop conversations. Requires macOS 14
-or newer. The native v1.0.0 release candidate retains the established bundle ID,
+or newer. The native app retains the established bundle ID,
 preferences, Keychain service, queue directories, and loopback hook port 48731 so
 an existing 0.1.x installation can upgrade without losing its connection settings.
 A new installation starts with a local-server URL and no ingestion credential.
 
 ## Installation and updates
 
-The signed native download is published separately under `macos-v1.0.0` after
-the release workflow succeeds. Existing signed installations use Check for
+Signed native downloads use separate `macos-v<version>` tags in
+[GitHub Releases](https://github.com/kylbutlr/status-watchr/releases).
+Existing signed installations use Check for
 Updates and the signed appcast at `https://statuswatchr.netlify.app/updates/appcast.xml`.
 Do not confuse the web/server `v1.0.0` source release with this native channel.
 Apple notarization is not claimed. Do not disable macOS security protections.
