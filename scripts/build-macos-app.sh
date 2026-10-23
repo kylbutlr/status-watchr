@@ -81,9 +81,13 @@ ditto "$sparkle_framework" "$contents_directory/Frameworks/Sparkle.framework"
 /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $application_build" "$contents_directory/Info.plist"
 
 # Embed provenance before signing. Dirty builds are explicitly identifiable, not claimed as exact commits.
-source_revision="$(git -C "$repository_root" rev-parse HEAD)"
-source_dirty=false
-if [[ -n "$(git -C "$repository_root" status --porcelain --untracked-files=normal)" ]]; then source_dirty=true; fi
+source_revision="source-archive"
+source_dirty=true
+if [[ -e "$repository_root/.git" ]] && git -C "$repository_root" rev-parse --verify HEAD >/dev/null 2>&1; then
+    source_revision="$(git -C "$repository_root" rev-parse HEAD)"
+    source_dirty=false
+    if [[ -n "$(git -C "$repository_root" status --porcelain --untracked-files=normal)" ]]; then source_dirty=true; fi
+fi
 /usr/libexec/PlistBuddy -c "Add :StatusWatchrSourceRevision string $source_revision" "$contents_directory/Info.plist"
 /usr/libexec/PlistBuddy -c "Add :StatusWatchrSourceDirty bool $source_dirty" "$contents_directory/Info.plist"
 

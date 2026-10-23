@@ -2,8 +2,8 @@ import XCTest
 @testable import StatusWatchr
 
 final class ServerOriginTests: XCTestCase {
-    func testPublicTelemetryUsesAnIndependentDirectory() {
-        XCTAssertTrue(ConnectionRecorder.directory(for: .watchr).path.contains("Status Watchr Public/connections-v1"))
+    func testUpgradePreservesEstablishedTelemetryDirectory() {
+        XCTAssertTrue(ConnectionRecorder.directory(for: .watchr).path.contains("Status Watchr/connections-v1"))
     }
     func testOnlyLoopbackAllowsHTTP() {
         XCTAssertTrue(canUseWatchrServer(URL(string: "http://127.0.0.1:4288/api/events")!))
