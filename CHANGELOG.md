@@ -1,5 +1,10 @@
 # Changelog
 
+## macOS 1.0.1
+
+- Fix a startup crash caused by opening the app's own bundle identifier as a named preferences suite. The installed app now uses its standard domain, preserving existing settings.
+- Verify preferences under the packaged app identity and smoke-test the signed bundle before publication.
+
 ## 1.1.0
 
 - Refresh workspace layout, form controls, spacing, and mobile presentation.

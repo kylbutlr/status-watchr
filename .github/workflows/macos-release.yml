@@ -154,6 +154,17 @@ jobs:
           STATUS_WATCHR_VERSION: ${{ steps.version.outputs.version }}
         run: ./scripts/release-macos-update.sh "${{ steps.version.outputs.version }}"
 
+      - name: Verify packaged preferences and signed app startup
+        env:
+          RELEASE_VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          python3 scripts/verify-macos-preferences.py
+          swift test --jobs 2 --package-path apps/macos
+          startup_directory="$RUNNER_TEMP/status-watchr-startup-check"
+          mkdir -p "$startup_directory"
+          ditto -x -k "public/updates/Status-Watchr-$RELEASE_VERSION.zip" "$startup_directory"
+          python3 scripts/verify-macos-startup.py "$startup_directory/Status Watchr.app"
+
       - name: Build Netlify site
         run: npm run build
 
