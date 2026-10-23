@@ -2,7 +2,7 @@ import Foundation
 import Security
 
 enum KeychainStore {
-    private static let service = "com.kylbutlr.statuswatchr.public"
+    private static let service = "com.kylbutlr.statuswatchr"
     private static let account = "watchr-ingest-token"
 
     static func readToken() -> String {

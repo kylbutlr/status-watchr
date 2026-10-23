@@ -1,3 +1,5 @@
+import {DashboardPreferences} from "./DashboardPreferences";
+import {readPreferences,savePreferences,type DashboardPreferences as Preferences} from "./dashboard-preferences";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { countSessions, savedPollingInterval, demoSessions, elapsedTime, faviconStatus, faviconTitle, finishedFaviconWindowMs, hasRecentlyFinished, mapLiveEvents, mapLiveSessions, pollingIntervalLabel, pollingIntervalOptions, relativeTime, repositoryLabel, statusLabels, type AgentEvent, type AgentSession, type AgentStatus, type FaviconStatus, type PollingInterval } from "./domain";
 import { replaceFavicon } from "./favicon";
@@ -26,11 +28,14 @@ function StatusDot({ status }: { status: AgentStatus }) {
 }
 
 function App() {
+  const [preferences,setPreferences]=useState(()=>{try{return readPreferences(window.localStorage);}catch{return readPreferences();}});
+  const updatePreferences=(value:Preferences)=>{setPreferences(value);try{return savePreferences(window.localStorage,value);}catch{return false;}};
+  useEffect(()=>{document.documentElement.dataset.appStylrTheme=preferences.theme;document.documentElement.dataset.appStylrDensity=preferences.density;},[preferences.theme,preferences.density]);
   const [passwordless, setPasswordless] = useState(false);
   const isLocalDemo = import.meta.env.DEV && import.meta.env.VITE_WATCHR_LIVE !== "true";
   const [previewCheckInAt] = useState(() => new Date(Date.now() - 120_000).toISOString());
   const [authState, setAuthState] = useState<"checking" | "signed_out" | "signed_in">(isLocalDemo ? "signed_in" : "checking");
-  const [filter, setFilter] = useState<Filter>("all");
+  const [filter, setFilter] = useState<Filter>(preferences.defaultFilter);
   const [selectedId, setSelectedId] = useState(demoSessions[0].id);
   const [mobileDetailsOpen, setMobileDetailsOpen] = useState(false);
   const [selectedWatch, setSelectedWatch] = useState<WatchedConversation | null>(null);
@@ -415,6 +420,8 @@ function App() {
       </header>
 
       <main className="main-content">
+        <section className="dashboard-intro"><h1>{preferences.workspaceName}</h1><p>{preferences.displayName ? `${preferences.displayName}'s workspace. ` : ''}Follow the conversations you choose to watch.</p></section>
+        <DashboardPreferences value={preferences} onSave={updatePreferences} />
         <NotificationOverview demo={isLocalDemo} sessions={sessions} onOpenWatch={openWatch}
           onSettingsClose={() => setShowConnection(false)}
           checkIn={<MacCheckIn receivedAt={isLocalDemo ? previewCheckInAt : collectorHealth?.received_at} />}
@@ -428,7 +435,7 @@ function App() {
                     {pollingIntervalOptions.map((seconds) => <option key={seconds} value={seconds}>{pollingIntervalLabel(seconds)}</option>)}
                   </select>
                   <button className="refresh-button" type="button" aria-label="Refresh now" onClick={() => void loadLiveSessions(true)} disabled={isLocalDemo || isRefreshing}>
-                    <span aria-hidden="true">↻</span>{isRefreshing ? "Refreshing" : "Refresh now"}
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true"><path d="M20 7v5h-5M4 17v-5h5M5.5 8a7 7 0 0 1 12-2L20 9M4 15l2.5 3a7 7 0 0 0 12-2"/></svg>{isRefreshing ? "Refreshing" : "Refresh now"}
                   </button>
                 </div>
               </div>
@@ -440,11 +447,11 @@ function App() {
           <section className="connection-detail-panel" aria-label="Connection details">
             <p className="collector-readiness" role="status">{isLocalDemo ? "Mac readiness is not measured in preview" : collectorHealthLabel(collectorHealth)}</p>
             <div><span className="detail-label">Source</span><strong>Mac lifecycle history and hooks</strong></div>
-            <div><span className="detail-label">Transport</span><strong>Private HTTPS ingestion</strong></div>
+            <div><span className="detail-label">Transport</span><strong>Authenticated server ingestion</strong></div>
             <div><span className="detail-label">Mode</span><strong>{isLocalDemo ? "Demo data" : "Live data"}</strong></div>
             <div><span className="detail-label">Phone access</span><strong>Observation only</strong></div>
             <p>
-              The Mac sends conversation titles and lifecycle metadata to this private dashboard. Message bodies, source code, terminal output, and diffs are not stored or sent to the hosted service. A dashboard refresh does not prove the Mac observer is healthy. In-progress runs can be waiting for input; question detection remains unverified. Respond to questions and approvals on the Mac.
+              The Mac sends conversation titles and lifecycle metadata to your configured server. Raw prompts, tool output, and diffs are not part of dashboard activity. Optional final-reply previews can contain sensitive information. A dashboard refresh does not prove the Mac observer is healthy. In-progress runs can be waiting for input; question detection remains unverified. Respond to questions and approvals on the Mac.
             </p>
           </section>
         ) : null}
@@ -459,7 +466,7 @@ function App() {
         <section className={`work-area${mobileDetailsOpen ? ' mobile-details-open' : ''}`}>
           <div className="session-column">
             <div className="section-heading">
-              <div><p className="eyebrow">Live queue</p><h2>Current work</h2></div>
+              <div><h2>Current work</h2></div>
               <span className="demo-badge">{isLocalDemo ? "Demo data" : isRefreshing ? "Refreshing" : liveError ? "Connection error" : "Live data"}</span>
             </div>
             <div className="filters" role="tablist" aria-label="Filter sessions">
@@ -504,7 +511,7 @@ function App() {
           <aside className="activity-panel" ref={detailPanel} tabIndex={-1} aria-label="Conversation details">
             <button className="text-button mobile-back" type="button" onClick={backToConversations}>← Back to conversations</button>
             {selectedSession ? <>
-              <div className="section-heading activity-heading"><div><p className="eyebrow">Selected task</p><h2>Activity log</h2></div><span className={`status-chip status-chip-${selectedSession.status}`}><StatusDot status={selectedSession.status} />{statusLabels[selectedSession.status]}</span></div>
+              <div className="section-heading activity-heading"><div><h2>Activity log</h2></div><span className={`status-chip status-chip-${selectedSession.status}`}><StatusDot status={selectedSession.status} />{statusLabels[selectedSession.status]}</span></div>
               <div className="selected-task">
                 <h3>{selectedSession.title}</h3>
                 <SessionContext session={selectedSession} />
@@ -519,11 +526,11 @@ function App() {
                 {selectedTimeline(selectedSession, timelineEvents, isLocalDemo).map((event) => <TimelineEvent key={event.id} event={event} />)}
               </div>
             </> : selectedWatch ? <div className="selected-task"><h3>Conversation {selectedWatch.threadId}</h3><p>Retained history is unavailable for this conversation.</p><Notifications threadId={selectedWatch.threadId} demo={isLocalDemo} /></div> : <div className="empty-state">No live activity has arrived yet. Start the Mac collector and refresh this page.</div>}
-            <button className="secondary-button" type="button" onClick={() => setShowConnection(true)}>How this connects <span aria-hidden="true">↗</span></button>
+            <button className="secondary-button" type="button" onClick={() => setShowConnection(true)}>Connection details</button>
           </aside>
         </section>
       </main>
-      <footer className="footer"><span>status watchr</span><span>Designed for a glance, built for trust.</span></footer>
+      <footer className="footer"><span>status watchr</span><a href="https://github.com/kylbutlr/status-watchr" target="_blank" rel="noreferrer">Source and setup</a></footer>
     </div></NotificationProvider>
   );
 }

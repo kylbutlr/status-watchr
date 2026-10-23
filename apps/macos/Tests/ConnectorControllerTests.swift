@@ -84,7 +84,7 @@ final class ConnectorControllerTests: XCTestCase {
     }
 
     func testCodexHookInstallerUsesLoopbackOnly() {
-        XCTAssertTrue(CodexHookInstaller.command.contains("127.0.0.1:48732/codex-hook"))
+        XCTAssertTrue(CodexHookInstaller.command.contains("127.0.0.1:48731/codex-hook"))
         XCTAssertTrue(CodexHookInstaller.eventNames.contains("PermissionRequest"))
     }
 

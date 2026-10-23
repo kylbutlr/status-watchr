@@ -118,7 +118,7 @@ public final class ConnectionRecorder: @unchecked Sendable {
         DistributedNotificationCenter.default().postNotificationName(ConnectionHealth.status, object: app.rawValue, userInfo: ["failed": failed], deliverImmediately: true)
     }
     public static func directory(for app: ConnectionApp) -> URL {
-        FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Library/Application Support/\(app == .watchr ? "Status Watchr Public" : app.rawValue)/connections-v1")
+        FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Library/Application Support/\(app == .watchr ? "Status Watchr" : app.rawValue)/connections-v1")
     }
     public func setPermission(_ value: ConnectionPermission, revision: Int? = nil, remaining: Double = 0) {
         lock.lock(); defer { lock.unlock() }

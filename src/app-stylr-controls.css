@@ -1,0 +1,40 @@
+/* Opt-in native controls. Product layout and interaction remain product-owned. */
+[data-app-stylr-controls] { --control-height: 44px; --control-inset: 12px; color-scheme: dark; }
+[data-app-stylr-theme="light"][data-app-stylr-controls], [data-app-stylr-theme="light"] [data-app-stylr-controls] { color-scheme: light; }
+[data-app-stylr-density="compact"] { --control-height: 40px; --control-inset: 8px; }
+[data-app-stylr-controls] :is(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]), select, textarea) {
+  box-sizing: border-box; min-width: 0; max-width: 100%; min-height: var(--control-height);
+  padding: var(--control-inset) 14px; border: 1px solid var(--ui-border-strong);
+  border-radius: var(--radius-control); background-color: var(--ui-surface-raised);
+  color: var(--ui-text); font: inherit; font-size: 16px; line-height: 1.4; caret-color: var(--ui-accent);
+}
+[data-app-stylr-controls] select {
+  appearance: none; padding-inline-end: 44px; text-overflow: ellipsis;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%23747b7b' stroke-width='1.8' viewBox='0 0 24 24'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-position: right 14px center; background-size: 16px; background-repeat: no-repeat;
+}
+[data-app-stylr-controls] select:dir(rtl) { background-position: left 14px center; padding-inline: 14px 44px; }
+[data-app-stylr-controls] select[multiple] { appearance: auto; background-image: none; padding: 8px; }
+[data-app-stylr-controls] option, [data-app-stylr-controls] optgroup { background: var(--ui-surface-raised); color: var(--ui-text); }
+[data-app-stylr-controls] :is(input,select,textarea):hover:not(:disabled) { border-color: var(--ui-accent); }
+[data-app-stylr-controls] :is(input,select,textarea,button):focus-visible { outline: 2px solid var(--ui-focus); outline-offset: 3px; }
+[data-app-stylr-controls] :is(input,select,textarea):disabled { opacity: .55; cursor: not-allowed; }
+[data-app-stylr-controls] :is(input,textarea)::placeholder { color: var(--ui-text-muted); opacity: 1; }
+[data-app-stylr-controls] :is(input,select,textarea)[aria-invalid="true"] { border-color: var(--ui-danger); }
+[data-app-stylr-controls] :is(input[type="checkbox"],input[type="radio"]) { accent-color: var(--ui-accent); width: 20px; height: 20px; flex: none; }
+@supports (appearance: base-select) and selector(::picker(select)) {
+  [data-app-stylr-controls] select:not([multiple]):not([size]), [data-app-stylr-controls] select:not([multiple]):not([size])::picker(select) { appearance: base-select; }
+  [data-app-stylr-controls] select:not([multiple]):not([size]) { background-image: none; padding-inline: 14px; gap: 16px; align-items: center; }
+  [data-app-stylr-controls] select::picker-icon { color: var(--ui-text-muted); margin-inline-start: auto; flex: none; }
+  [data-app-stylr-controls] select::picker(select) {
+    padding: 6px; margin-block: 6px; border: 1px solid var(--ui-border-strong);
+    border-radius: var(--radius-control); background: var(--ui-surface-raised); color: var(--ui-text);
+    max-height: min(340px, 65dvh); overflow: auto; box-shadow: 0 12px 32px rgb(0 0 0 / .2);
+  }
+  [data-app-stylr-controls] option { min-height: 40px; padding: 10px 12px; border-radius: var(--radius-control); gap: 12px; overflow-wrap: anywhere; }
+  [data-app-stylr-controls] option:is(:hover,:focus-visible,:checked) { background: var(--ui-selected); color: var(--ui-selected-text); }
+  [data-app-stylr-controls] option:disabled { opacity: .5; }
+  [data-app-stylr-controls] option::checkmark { order: 1; margin-inline-start: auto; }
+}
+@media (pointer: coarse) { [data-app-stylr-controls] { --control-height: 44px; } }
+@media (forced-colors: active) { [data-app-stylr-controls] select { appearance: auto; background-image: none; } }

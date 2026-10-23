@@ -1,4 +1,5 @@
 @import "./app-stylr.css";
+@import "./app-stylr-controls.css";
 @font-face { font-family: Geist; src: url('/fonts/Geist-Variable.woff2') format('woff2'); font-style: normal; font-weight: 100 900; font-display: swap; }
 @font-face { font-family: 'Geist Mono'; src: url('/fonts/GeistMono-Variable.woff2') format('woff2'); font-style: normal; font-weight: 100 900; font-display: swap; }
 
@@ -112,18 +113,6 @@ h1 { margin-bottom: 12px; font-size: clamp(38px, 5vw, 62px); line-height: .98; l
 
 /* Status overlays keep the existing App Stylr card language while making the queue scannable. */
 .session-card { position: relative; overflow: hidden; }
-.session-card::before { position: absolute; inset: 0 auto 0 0; width: 3px; content: ""; background: var(--border-strong); }
-.session-card > * { position: relative; z-index: 1; }
-.session-card-status-working:not(.is-selected) { background: linear-gradient(105deg, rgba(169, 206, 194, .1), var(--surface) 46%); }
-.session-card-status-working::before { background: var(--accent); }
-.session-card-status-needs_you:not(.is-selected) { background: linear-gradient(105deg, rgba(242, 196, 111, .12), var(--surface) 46%); }
-.session-card-status-needs_you::before { background: var(--warning); }
-.session-card-status-finished:not(.is-selected) { background: linear-gradient(105deg, rgba(130, 211, 167, .08), var(--surface) 46%); }
-.session-card-status-finished::before { background: var(--success); }
-.session-card-status-failed:not(.is-selected) { background: linear-gradient(105deg, rgba(255, 145, 137, .12), var(--surface) 46%); }
-.session-card-status-failed::before { background: var(--danger); }
-.session-card-status-stale:not(.is-selected) { background: linear-gradient(105deg, rgba(169, 181, 178, .07), var(--surface) 46%); }
-.session-card-status-stale::before { background: var(--muted-dim); }
 .session-card-status-finished:not(.is-selected), .session-card-status-stale:not(.is-selected) { border-color: rgba(116, 116, 121, .68); }
 .session-card-status-finished { padding-top: 13px; padding-bottom: 12px; }
 .session-card-status-finished h3 { margin-top: 11px; margin-bottom: 5px; font-size: 14px; }
@@ -204,3 +193,62 @@ h1 { margin-bottom: 12px; font-size: clamp(38px, 5vw, 62px); line-height: .98; l
 }
 
 .avatar { display: inline-flex; align-items: center; justify-content: center; }
+
+/* Public workspace chrome. Data, notification controls and source states stay intact. */
+body { background: var(--canvas); }
+.topbar { background: var(--ui-sidebar); border-color: var(--ui-border); height: 76px; padding-inline: max(28px,calc((100vw - 1280px)/2)); }
+.main-content { width: min(1280px,calc(100% - 64px)); padding-block: 40px 56px; }
+.dashboard-intro { order: -3; margin-bottom: 28px; }
+.dashboard-intro h1 { font-size: clamp(28px,3vw,38px); line-height: 1.2; letter-spacing: -.03em; margin-bottom: 12px; overflow-wrap: anywhere; }
+.dashboard-intro p { font-size: 15px; line-height: 1.6; color: var(--muted); margin: 0; }
+.dashboard-preferences { order: -2; margin-bottom: 28px; border: 1px solid var(--border); border-radius: var(--radius-card); padding: 0 24px; background: var(--surface); }
+.dashboard-preferences summary { cursor: pointer; padding-block: 20px; min-height: 44px; font-size: 15px; font-weight: 600; }
+.dashboard-preferences > p { font-size: 14px; line-height: 1.6; color: var(--muted); max-width: 75ch; }
+.dashboard-preferences > p:empty { display: none; }
+.dashboard-preferences form { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); align-items: end; gap: 24px; padding-block: 20px 24px; }
+.dashboard-preferences label { display: grid; gap: 8px; min-width: 0; color: var(--muted); font-size: 13px; }
+.dashboard-preferences :is(input,select) { width: 100%; }
+.preference-actions { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+.preference-actions button { min-height: 44px; font-size: 14px; margin: 0; }
+.notification-overview { background: var(--surface); padding: 24px; margin-bottom: 0; gap: 20px; }
+.notification-overview h2 { font-size: 18px; letter-spacing: -.02em; }
+.notification-overview button,.polling-controls label { font-size: 14px; }
+.all-notification-actions select { padding-inline-end: 44px; }
+.summary-grid { border-block: 1px solid var(--border); margin-top: 32px; gap: 0; }
+.summary-card { min-height: auto; padding: 24px; border: 0; border-radius: 0; background: transparent; gap: 10px; }
+.summary-card + .summary-card { border-left: 1px solid var(--border); }
+.summary-card strong { font-size: 28px; letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
+.summary-label { font: 14px/1.4 Geist,sans-serif; text-transform: none; letter-spacing: 0; }
+.summary-note { font-size: 13px; }
+.work-area { gap: 32px; margin-top: 36px; }
+.section-heading { align-items: center; margin-bottom: 20px; }
+.section-heading h2 { font-size: 22px; line-height: 1.3; letter-spacing: -.02em; }
+.filters { flex-wrap: wrap; gap: 6px; }
+.filter-button { min-height: 40px; font-size: 13px; padding: 8px 12px; }
+.session-card { padding: var(--record-inset,20px); border-radius: 8px; background: var(--surface); }
+.session-card::before { content: none; }
+.session-card[class*="session-card-status-"]:not(.is-selected) { background: var(--surface); }
+.session-card.is-selected { background: var(--ui-selected); color: var(--ui-selected-text); border-color: var(--ui-accent); }
+.session-card h3 { font-size: 16px; line-height: 1.5; letter-spacing: -.015em; }
+.session-card-meta,.session-card-activity { font-size: 13px; line-height: 1.55; }
+.session-time { font-size: 12px; }
+.activity-panel { padding: 24px; border-radius: var(--radius-card); background: var(--surface); }
+.selected-task h3 { font-size: 20px; line-height: 1.45; letter-spacing: -.02em; }
+.timeline-event strong { font-size: 14px; line-height: 1.5; }
+.timeline-event p,.timeline-event time { font-size: 12px; line-height: 1.5; }
+.selected-task-facts span { font: 12px/1.5 Geist,sans-serif; text-transform: none; letter-spacing: 0; }
+.selected-task-facts strong { font-size: 13px; }
+.connection-detail-panel { background: var(--surface); }
+.footer { width: min(1280px,calc(100% - 64px)); font-size: 13px; }
+.footer a { color: var(--muted); text-underline-offset: 4px; }
+.auth-shell { background: var(--canvas); }
+.auth-card { background: var(--surface); padding: 32px; }
+.auth-card h1 { letter-spacing: -.03em; line-height: 1.2; font-size: 32px; }
+.auth-card label { text-transform: none; letter-spacing: 0; font: 14px Geist,sans-serif; }
+.auth-card input { font-size: 16px; }
+.auth-copy { font-size: 15px; line-height: 1.6; }
+.auth-footnote { font: 13px/1.6 Geist,sans-serif; }
+[data-app-stylr-density="compact"] { --record-inset: 12px; }
+[data-app-stylr-density="compact"] .summary-card { padding-block: 16px; }
+@media(max-width:850px) { .main-content,.footer { width: calc(100% - 40px); } .dashboard-preferences form { grid-template-columns: 1fr 1fr; } .work-area { gap: 24px; } }
+@media(max-width:520px) { .topbar { height: 68px; padding-inline: 20px; } .main-content { padding-top: 28px; } .dashboard-preferences { padding-inline: 20px; } .dashboard-preferences form { grid-template-columns: 1fr; gap: 20px; } .notification-overview { padding: 20px; } .summary-grid { grid-template-columns: 1fr 1fr; } .summary-card { padding: 20px 12px; } .summary-card:nth-child(3) { border-left: 0; } .summary-card:nth-child(n+3) { border-top: 1px solid var(--border); } .activity-panel { padding: 20px; } }

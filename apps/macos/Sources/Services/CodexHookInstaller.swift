@@ -1,8 +1,8 @@
 import Foundation
 
 enum CodexHookInstaller {
-    static let command = "/usr/bin/curl --silent --max-time 1 --output /dev/null --header 'Content-Type: application/json' --data-binary @- http://127.0.0.1:48732/codex-hook"
-    static let legacyCommand = "/usr/bin/curl --silent --show-error --max-time 1 --output /dev/null --data-binary @- http://127.0.0.1:48732/codex-hook"
+    static let command = "/usr/bin/curl --silent --max-time 1 --output /dev/null --header 'Content-Type: application/json' --data-binary @- http://127.0.0.1:48731/codex-hook"
+    static let legacyCommand = "/usr/bin/curl --silent --show-error --max-time 1 --output /dev/null --data-binary @- http://127.0.0.1:48731/codex-hook"
     static let eventNames = ["UserPromptSubmit", "PermissionRequest", "PostToolUse", "Stop", "Interrupt", "SubagentStart", "SubagentStop"]
 
     static var defaultHooksURL: URL {

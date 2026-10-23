@@ -1,39 +1,45 @@
 # Status Watchr Mac companion
 
-A source-built menu-bar observer for selected Codex Desktop conversations.
+A menu-bar observer for selected Codex Desktop conversations. Requires macOS 14
+or newer. The native v1.0.0 release candidate retains the established bundle ID,
+preferences, Keychain service, queue directories, and loopback hook port 48731 so
+an existing 0.1.x installation can upgrade without losing its connection settings.
+A new installation starts with a local-server URL and no ingestion credential.
 
-Requires macOS 14 or newer and the Swift 6.2 toolchain. From the repository root:
+## Installation and updates
+
+The signed native download is published separately under `macos-v1.0.0` after
+the release workflow succeeds. Existing signed installations use Check for
+Updates and the signed appcast at `https://statuswatchr.netlify.app/updates/appcast.xml`.
+Do not confuse the web/server `v1.0.0` source release with this native channel.
+Apple notarization is not claimed. Do not disable macOS security protections.
+
+## Configure your server
+
+Run the standalone server first, then enter its origin and ingestion token from
+`data/server-secrets.json` in the companion's settings. The default origin is
+`http://127.0.0.1:4288`. Remote origins require HTTPS. Credentials never belong in
+URLs, issue reports, or screenshots. The server token is separate from the
+optional dashboard password. Start monitoring explicitly.
+
+Recovery intervals, hooks, and experimental question alerts remain configurable.
+The observer does not start, resume, answer, or approve agent conversations.
+Source availability, completion confirmation, and queued delivery remain distinct.
+Phone delivery needs your own HTTPS setup and a physical-device test.
+
+## Build and verify source
+
+Use the source archive or repository checkout, with Swift 6.2 or newer. The
+standalone server archive does not include the Mac source:
+
 
 ```sh
+swift test --jobs 2 --package-path apps/macos
 swift run --configuration release --package-path apps/macos
 ```
 
-This runs the source-built companion. It does not install over an existing Mac
-app and does not use the private pilot's update feed. Stop this foreground run
-with Ctrl+C. Public source builds update manually.
+The foreground source run stops with Ctrl+C. It does not replace an installed
+bundle. Source runs use the same app preferences and hook ownership as the signed
+app; do not run both observers at once. Test-only fixtures use temporary storage.
 
-Start the standalone server first, then set the companion's server URL to
-http://127.0.0.1:4288 and enter the ingestion token from the server's local
-`data/server-secrets.json`. That token is separate from the optional dashboard
-password. Start monitoring explicitly. Never put a token in a URL or issue.
-
-Remote server URLs require HTTPS. Loopback HTTP is accepted for a server on the
-same Mac. Requests carrying credentials do not follow redirects. Saved connection
-settings use the existing native preferences and credential store; the public
-release does not change or migrate another installed copy's settings.
-
-The observer reads local Codex metadata without starting or resuming conversations.
-A successful connection is not proof that the source is available. Completion
-confirmation, parent/child suppression, and queued delivery all preserve explicit
-unavailable states. Question/attention detection remains experimental.
-
-```sh
-swift test --package-path apps/macos
-```
-
-There is no prebuilt, notarized, or automatically updated Mac binary in v1.0.0.
-A public signed-app channel would be a separate release with its own validation.
-Read [self-hosting](../../docs/self-hosting.md) and [privacy](../../docs/privacy.md)
-before configuring phone alerts or optional hooks.
-
-Public source builds use loopback hook port `48732`, separate from the private pilot's `48731`. Installing or removing public hooks preserves the private handlers.
+See [self-hosting](../../docs/self-hosting.md) and [privacy](../../docs/privacy.md).
