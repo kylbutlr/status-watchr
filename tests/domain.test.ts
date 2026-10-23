@@ -105,8 +105,8 @@ describe("agent watchr domain", () => {
         {
           id: "thread-1:turn:turn-3",
           thread_id: "thread-1",
-          title: "BRN: 495798",
-          repo: "browns-shopify",
+          title: "Fictional catalog review",
+          repo: "fictional-storefront",
           branch: "current-fix",
           status: "working",
           status_detail: "Activity received",
@@ -118,8 +118,8 @@ describe("agent watchr domain", () => {
         {
           id: "thread-1:turn:turn-2",
           thread_id: "thread-1",
-          title: "BRN: 495798",
-          repo: "browns-shopify",
+          title: "Fictional catalog review",
+          repo: "fictional-storefront",
           branch: "previous-fix",
           status: "finished",
           status_detail: "Completed successfully",
@@ -131,8 +131,8 @@ describe("agent watchr domain", () => {
         {
           id: "thread-1:turn:turn-1",
           thread_id: "thread-1",
-          title: "BRN: 495798",
-          repo: "browns-shopify",
+          title: "Fictional catalog review",
+          repo: "fictional-storefront",
           branch: "old-fix",
           status: "working",
           status_detail: "Activity received",
@@ -152,7 +152,7 @@ describe("agent watchr domain", () => {
     expect(sessions).toHaveLength(1);
     expect(sessions[0]).toMatchObject({
       id: "thread-1:turn:turn-3",
-      title: "BRN: 495798",
+      title: "Fictional catalog review",
       branch: "current-fix",
       status: "working",
     });
@@ -161,8 +161,8 @@ describe("agent watchr domain", () => {
 
   it("keeps separate Codex tasks when their titles match", () => {
     const sharedFields = {
-      title: "BRN: 495798",
-      repo: "browns-shopify",
+      title: "Fictional catalog review",
+      repo: "fictional-storefront",
       branch: "main",
       status: "working",
       status_detail: "Activity received",
@@ -189,8 +189,8 @@ describe("agent watchr domain", () => {
         {
           id: "thread-1:turn:turn-1",
           thread_id: "thread-1",
-          title: "BRN: 495798",
-          repo: "browns-shopify",
+          title: "Fictional catalog review",
+          repo: "fictional-storefront",
           branch: "main",
           status: "working",
           status_detail: "Activity received",
@@ -202,8 +202,8 @@ describe("agent watchr domain", () => {
         {
           id: "thread-1",
           thread_id: "thread-1",
-          title: "BRN: 495798",
-          repo: "browns-shopify",
+          title: "Fictional catalog review",
+          repo: "fictional-storefront",
           branch: "main",
           status: "needs_you",
           status_detail: "Waiting for your input",

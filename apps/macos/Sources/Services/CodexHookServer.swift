@@ -2,7 +2,7 @@ import Foundation
 import Network
 
 final class CodexHookServer: @unchecked Sendable {
-    static let port: UInt16 = 48731
+    static let port: UInt16 = 48732
 
     private let queue = DispatchQueue(label: "com.kylbutlr.statuswatchr.codex-hooks")
     private let onEvent: (Data) -> Void
