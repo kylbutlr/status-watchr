@@ -1,43 +1,40 @@
-<?xml version="1.0" standalone="yes"?>
-<!-- sparkle-sign-warning:
+<?xml version="1.0" standalone="yes"?><!-- sparkle-sign-warning:
 IMPORTANT: This file was signed by Sparkle. Any modifications to this file requires re-signing this file with generate_appcast or sign_update! The signed signature will be embedded at the end of this file.
--->
-<rss xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" version="2.0">
+--><rss xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" version="2.0">
     <channel>
         <title>Status Watchr</title>
         <item>
+            <title>1.0.0</title>
+            <pubDate>Fri, 23 Oct 2026 06:54:25 +0000</pubDate>
+            <link>https://statuswatchr.netlify.app</link>
+            <sparkle:version>1000000</sparkle:version>
+            <sparkle:shortVersionString>1.0.0</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
+            <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
+            <enclosure url="https://statuswatchr.netlify.app/updates/Status-Watchr-1.0.0.zip" length="2516669" type="application/octet-stream" sparkle:edSignature="Qr47+2eG2MjB2yPcNL7vPycMyZFmfUEgQDacRthwqXLd1bwbD9F81pcUaRjvHVAYJnsqbu0ljs5xS1lOariHBg=="></enclosure>
+        </item>
+        <item>
             <title>0.1.44</title>
-            <pubDate>Mon, 12 Oct 2026 04:39:36 +0000</pubDate>
+            <pubDate>Fri, 23 Oct 2026 06:54:25 +0000</pubDate>
             <link>https://statuswatchr.netlify.app</link>
             <sparkle:version>1044</sparkle:version>
             <sparkle:shortVersionString>0.1.44</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
             <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
-            <enclosure url="https://statuswatchr.netlify.app/updates/Status-Watchr-0.1.44.zip" length="2516127" type="application/octet-stream" sparkle:edSignature="w5PHNLSGhCDjQkexs6dcRrjZP5j5eKBRE1xoeUAiGEGJCpIMU1IUF9h9rPECsPPmQaoHswOJq7p1bwlTWJuQAg=="/>
+            <enclosure url="https://statuswatchr.netlify.app/updates/Status-Watchr-0.1.44.zip" length="2516127" type="application/octet-stream" sparkle:edSignature="w5PHNLSGhCDjQkexs6dcRrjZP5j5eKBRE1xoeUAiGEGJCpIMU1IUF9h9rPECsPPmQaoHswOJq7p1bwlTWJuQAg=="></enclosure>
         </item>
         <item>
             <title>0.1.43</title>
-            <pubDate>Sun, 11 Oct 2026 22:29:52 +0000</pubDate>
+            <pubDate>Fri, 23 Oct 2026 06:54:25 +0000</pubDate>
             <link>https://statuswatchr.netlify.app</link>
             <sparkle:version>1043</sparkle:version>
             <sparkle:shortVersionString>0.1.43</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
             <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
-            <enclosure url="https://statuswatchr.netlify.app/updates/Status-Watchr-0.1.43.zip" length="2494156" type="application/octet-stream" sparkle:edSignature="dFe+ngm3HhwaKo5Tpkx9051RYPR/9E9uOBlaKHaQZXaB9RnIPKJKhW9cYrobYYubZQsoZVt9cD1IF7OB77xCAQ=="/>
-        </item>
-        <item>
-            <title>0.1.42</title>
-            <pubDate>Sun, 11 Oct 2026 20:44:13 +0000</pubDate>
-            <link>https://statuswatchr.netlify.app</link>
-            <sparkle:version>1042</sparkle:version>
-            <sparkle:shortVersionString>0.1.42</sparkle:shortVersionString>
-            <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
-            <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
-            <enclosure url="https://statuswatchr.netlify.app/updates/Status-Watchr-0.1.42.zip" length="2485839" type="application/octet-stream" sparkle:edSignature="/mzQAECH3U0BD3xe9LtMnQoDfXPtMXoNW7CWd1qMbywzdFgOeWEbSZTRrPMDHWNlyVX+1oG8Se9q0Fe+xTTQCw=="/>
+            <enclosure url="https://statuswatchr.netlify.app/updates/Status-Watchr-0.1.43.zip" length="2494156" type="application/octet-stream" sparkle:edSignature="dFe+ngm3HhwaKo5Tpkx9051RYPR/9E9uOBlaKHaQZXaB9RnIPKJKhW9cYrobYYubZQsoZVt9cD1IF7OB77xCAQ=="></enclosure>
         </item>
     </channel>
-</rss>
-<!-- sparkle-signatures:
-edSignature: 3+UbntXPsYQojF6gWqrBTxOewkQtDP31yOtjd0WEymeW3vky3dIoGd4ci7PqbQ4clucHJIn1jy+JIYjjmFYiBw==
-length: 2621
+</rss><!-- sparkle-signatures:
+edSignature: /zjA6zp+yvMocMm+7GxhzSirx1IO71jQ1Nld8SxJHMSGkA9OPa4IgSUvQLlNJC2yeCLfzCI0XW//R8czK6JnDg==
+length: 2651
 -->
