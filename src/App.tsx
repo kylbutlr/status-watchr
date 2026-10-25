@@ -160,12 +160,14 @@ function App() {
 
   const loadLiveSessions = useCallback(async (force = false): Promise<"success" | "unchanged" | "failure" | "skipped"> => {
     if (document.visibilityState === "hidden" || !navigator.onLine) return "skipped";
+    if (!force && refreshController.current && !refreshController.current.signal.aborted) return "skipped";
     refreshController.current?.abort();
     const controller = new AbortController();
     refreshController.current = controller;
+    const signal = AbortSignal.any([controller.signal, AbortSignal.timeout(15_000)]);
     setIsRefreshing(true);
     try {
-      void fetch("/api/collector", { cache: "no-store", signal: controller.signal }).then(async (response) => {
+      void fetch("/api/collector", { cache: "no-store", signal }).then(async (response) => {
         if (!response.ok) { setCollectorHealth(null); return; }
         const health = await response.json();
         if (!controller.signal.aborted) setCollectorHealth(health.collector ?? null);
@@ -174,7 +176,7 @@ function App() {
       if (filter !== "all") params.set("status", filter);
       if (!force && snapshotRevisionRef.current) params.set("since", snapshotRevisionRef.current);
       const query = params.size ? `?${params}` : "";
-      const response = await fetch(`/api/sessions${query}`, { cache: "no-store", signal: controller.signal });
+      const response = await fetch(`/api/sessions${query}`, { cache: "no-store", signal });
       if (response.status === 401) {
         setAuthState("signed_out");
         return "skipped";
@@ -330,21 +332,34 @@ function App() {
   }, [isLocalDemo]);
 
   useEffect(() => {
+    // A permission renewal or cadence change can restart the scheduler without
+    // invalidating its snapshot. Only a different view/session cancels that read.
+    return () => { refreshController.current?.abort(); };
+  }, [authState, filter, isLocalDemo]);
+
+  useEffect(() => {
     if (isLocalDemo || authState !== "signed_in") return;
     let refreshTimer: number | undefined;
     let runGeneration = 0;
     let consecutiveFailures = 0;
     let unchangedPolls = 0;
     let stopped = false;
+    let inFlight = false;
 
     const schedule = () => {
       if (stopped || (pollingInterval === 0 && workSwitch.allowed()) || document.visibilityState === "hidden" || !navigator.onLine) return;
       refreshTimer = window.setTimeout(() => void run(), workSwitch.allowed() ? pollingDelayMs(pollingInterval, consecutiveFailures, unchangedPolls) : 30_000);
     };
     const run = async () => {
+      // Return events can arrive together. Reuse the current read rather than aborting
+      // it and starting SQL that the server may still execute after client cancellation.
+      if (stopped || inFlight) return;
+      inFlight = true;
       const generation = ++runGeneration;
       if (refreshTimer !== undefined) window.clearTimeout(refreshTimer);
-      const result = workSwitch.allowed() ? await loadLiveSessions() : "paused";
+      let result: Awaited<ReturnType<typeof loadLiveSessions>> | 'paused';
+      try { result = workSwitch.allowed() ? await loadLiveSessions() : "paused"; }
+      finally { inFlight = false; }
       if (stopped || generation !== runGeneration) return;
       if (result === "failure") consecutiveFailures += 1;
       if (result === "success" || result === "unchanged") consecutiveFailures = 0;
@@ -370,7 +385,6 @@ function App() {
       document.removeEventListener("visibilitychange", handleVisibilityChange);
       window.removeEventListener("focus", runImmediately);
       window.removeEventListener("online", runImmediately);
-      refreshController.current?.abort();
     };
   }, [authState, isLocalDemo, loadLiveSessions, pollingInterval, workSwitch.allowed, workSwitch.change]);
 

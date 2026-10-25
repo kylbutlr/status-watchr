@@ -9,6 +9,7 @@ export function validPermission(value: unknown): value is Permission {
 }
 export function useWorkSwitch(enabled: boolean) {
   const [permission, setPermission] = useState<Permission | null>(null);
+  const [resumes, setResumes] = useState(0);
   const lease = useRef({ wall: 0, monotonic: 0, active: false });
   const allowed = useCallback(() => enabled && lease.current.active && Date.now() < lease.current.wall && performance.now() < lease.current.monotonic, [enabled]);
   useEffect(() => {
@@ -19,7 +20,7 @@ export function useWorkSwitch(enabled: boolean) {
     let inFlight = false;
     const abort = new AbortController();
     const check = async () => {
-      if (stopped || inFlight || document.visibilityState === "hidden") return;
+      if (stopped || inFlight || document.visibilityState === "hidden" || !navigator.onLine) return;
       inFlight = true;
       const started = performance.now();
       try {
@@ -28,7 +29,11 @@ export function useWorkSwitch(enabled: boolean) {
         if (!response.ok || !validPermission(next)) throw new Error("Invalid work permission");
         if (stopped) return;
         const remaining = Math.max(0, next.leaseSeconds * 1000 - (performance.now() - started));
+        const wasAllowed = allowed();
         lease.current = { wall: Date.now() + remaining, monotonic: performance.now() + remaining, active: next.state === "active" };
+        // An expired lease can recover without a server revision change, such as
+        // after an offline period. Wake consumers once permission is valid again.
+        if (!wasAllowed && allowed()) setResumes((current) => current + 1);
         setPermission(next);
       } catch {
         if (!stopped) {
@@ -42,11 +47,11 @@ export function useWorkSwitch(enabled: boolean) {
     document.addEventListener("visibilitychange", check);
     window.addEventListener("online", check);
     return () => { stopped = true; abort.abort(); window.clearInterval(timer); document.removeEventListener("visibilitychange", check); window.removeEventListener("online", check); };
-  }, [enabled]);
+  }, [enabled, allowed]);
   return {
     allowed,
     // Stable between control reads; a state/revision transition wakes consumers immediately.
-    change: permission ? `${permission.state}:${permission.revision}` : "pending",
+    change: permission ? `${permission.state}:${permission.revision}:${resumes}` : "pending",
     label: !enabled || permission?.configured === false ? null : permission?.state === "active" ? "Switchr: On" : permission?.state === "standby" ? "Switchr: Off" : "Switchr: Pending",
   };
 }
