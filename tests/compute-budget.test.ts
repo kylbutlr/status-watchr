@@ -33,6 +33,47 @@ it('does not open Neon for an empty notification retry tick', async () => {
   expect(mock.open).not.toHaveBeenCalled();
 });
 
+it('leaves future retry receipts off Neon', async () => {
+  mock.records.set('wakes/future', { notificationId: 'opaque', dueAt: Date.now() + 300_000 });
+  await retry();
+  expect(mock.open).not.toHaveBeenCalled();
+  expect(mock.records.has('wakes/future')).toBe(true);
+});
+
+it('reconciles a due receipt and removes it when no delivery remains', async () => {
+  vi.stubEnv('WATCHR_VAPID_PUBLIC_KEY', 'fixture');
+  vi.stubEnv('WATCHR_VAPID_PRIVATE_KEY', 'fixture');
+  vi.stubEnv('WATCHR_VAPID_SUBJECT', 'mailto:fixture@example.com');
+  const sql = vi.fn(async () => []);
+  mock.open.mockReturnValue(sql);
+  mock.records.set('wakes/due', { notificationId: 'opaque', dueAt: 0 });
+  await retry();
+  expect(mock.open).toHaveBeenCalledOnce();
+  expect(sql).toHaveBeenCalledTimes(2); // Delivery lease attempt, then pending-job reconciliation.
+  expect(mock.records.has('wakes/due')).toBe(false);
+  mock.open.mockClear(); sql.mockClear();
+  await retry();
+  expect(mock.open).not.toHaveBeenCalled();
+  expect(sql).not.toHaveBeenCalled();
+});
+
+it('retries failed initialization before marking recovery complete', async () => {
+  mock.records.delete('initialized');
+  const sql = vi.fn().mockRejectedValueOnce(new Error('fixture failure')).mockResolvedValue([]);
+  mock.open.mockReturnValue(sql);
+  vi.spyOn(console, 'error').mockImplementation(() => {});
+  try {
+    await expect(retry()).rejects.toThrow('Notification maintenance unavailable');
+    expect(mock.records.has('initialized')).toBe(false);
+    await retry();
+    expect(mock.records.get('initialized')).toBe(true);
+    expect(sql).toHaveBeenCalledTimes(2);
+    mock.open.mockClear();
+    await retry();
+    expect(mock.open).not.toHaveBeenCalled();
+  } finally { vi.restoreAllMocks(); }
+});
+
 it('stores and reads authenticated Mac check-ins without opening Neon', async () => {
   const response = await handler(new Request('https://watchr.test/api/collector', {
     method: 'POST', headers: { authorization: 'Bearer ingest-test' },
