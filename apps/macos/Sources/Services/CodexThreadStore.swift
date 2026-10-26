@@ -11,7 +11,9 @@ struct CodexThreadStore {
         return threads
     }
 
-    func read() -> CodexThreadInventoryRead { read(selection: .inventory) }
+    func read(includingActiveHistoryIDs: Set<String> = []) -> CodexThreadInventoryRead {
+        read(selection: .inventory(includingActiveHistoryIDs))
+    }
 
     /// A completion's ancestor can be archived or outside the recent discovery window.
     func thread(id: String) -> [String: Any]? {
@@ -42,7 +44,7 @@ struct CodexThreadStore {
         return !rows.isEmpty
     }
 
-    private enum Selection { case inventory, titleRepairs, relationships, thread(String), reviews, observableID(String) }
+    private enum Selection { case inventory(Set<String>), titleRepairs, relationships, thread(String), reviews, observableID(String) }
 
     private func read(selection: Selection) -> CodexThreadInventoryRead {
         let candidates = (try? FileManager.default.contentsOfDirectory(at: codexHome, includingPropertiesForKeys: nil)) ?? []
@@ -97,7 +99,12 @@ struct CodexThreadStore {
             } else if case .titleRepairs = selection {
                 scope = "\(isSubagent) = 1 AND coalesce(nullif(trim(t.name), ''), nullif(trim(t.title), ''), 'Untitled task') = 'Untitled task' AND NOT \(internalReview) ORDER BY t.id"
             } else {
-                scope = "t.archived = 0 AND NOT \(internalReview) ORDER BY t.updated_at DESC LIMIT 100"
+                // Current history can use a different ID from its stable conversation.
+                // Match via the validated rollout filename below, without reading rollout bodies.
+                let limit: String
+                if case .inventory(let activeIDs) = selection, !activeIDs.isEmpty { limit = "" }
+                else { limit = " LIMIT 100" }
+                scope = "t.archived = 0 AND NOT \(internalReview) ORDER BY t.updated_at DESC\(limit)"
             }
             query = """
                 SELECT t.id, t.name, t.title, t.cwd, \(rollout), parent.name, parent.title,
@@ -131,10 +138,17 @@ struct CodexThreadStore {
             sqlite3_bind_text(statement, 1, id, -1, transient)
         }
         var threads: [[String: Any]] = []
+        var inventoryPosition = 0
         var result = sqlite3_step(statement)
         while result == SQLITE_ROW {
             func text(_ index: Int32) -> String? { sqlite3_column_text(statement, index).map { String(cString: $0) } }
             if let id = text(0) {
+                if case .inventory(let activeIDs) = selection {
+                    let historyID = Self.historyID(taskID: id, rolloutPath: text(4))
+                    let include = inventoryPosition < 100 || activeIDs.contains(historyID)
+                    inventoryPosition += 1
+                    if !include { result = sqlite3_step(statement); continue }
+                }
                 switch selection {
                 case .relationships:
                     if let parentID = text(1) { threads.append(["id": id, "parentThreadId": parentID]) }

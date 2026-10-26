@@ -48,3 +48,8 @@ enum CodexTurnHistoryRead: Equatable {
     case available([String: [LocalSessionState]])
     case unavailable(CodexMetadataReadFailure)
 }
+
+enum CodexActiveThreadIDsRead: Equatable {
+    case available(Set<String>)
+    case unavailable(CodexMetadataReadFailure)
+}
