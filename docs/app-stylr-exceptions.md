@@ -12,7 +12,7 @@ The selected design is preserved on local prototype branch `kylebutler/menu-icon
 
 ## Public self-hosted release
 
-Geist fonts are bundled under public/fonts with their license. No Google Fonts request is needed. Existing semantic aliases, layouts, status labels, focus states, phone navigation, and reduced-motion behavior are retained.
+Geist fonts are bundled under public/fonts with their license. No Google Fonts request is needed. Existing local semantic aliases, layouts, status labels, focus states, phone navigation, and reduced-motion behavior are retained.
 
 Mac source builds and signed releases share the established app identity,
 preferences, Keychain service, application-support directories, and hook

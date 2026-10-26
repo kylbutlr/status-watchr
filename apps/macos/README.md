@@ -28,6 +28,18 @@ The observer does not start, resume, answer, or approve agent conversations.
 Source availability, completion confirmation, and queued delivery remain distinct.
 Phone delivery needs your own HTTPS setup and a physical-device test.
 
+Starting monitoring or resuming after Switchr Off reconciles conversations that
+are already in progress, without requiring another hook or state transition.
+Discovery combines the 100 most recently updated conversations with every
+non-archived, non-review conversation whose latest projected turn is in progress.
+Resumed history IDs stay attached to their original conversation. Old orphaned
+in-progress turns do not override a newer completed turn.
+
+Resume bypasses the heartbeat throttle once, then returns to the configured scan
+and heartbeat cadence. Notification confirmation, standby suppression, and retry
+rules remain in effect. These reads use local Codex metadata; reconciliation
+uploads use the existing authenticated outbox and hosted ingestion path.
+
 ## Build and verify source
 
 Use the source archive or repository checkout, with Swift 6.2 or newer. The

@@ -235,6 +235,7 @@ final class ConnectorController: ObservableObject {
     private let threadStore: CodexThreadStore
     private let finalReplyStore = CodexFinalReplyStore()
     private var inventoryFailure: CodexMetadataReadFailure?
+    private var activeHistoryFailure: CodexMetadataReadFailure?
     private var hookRequestID: Int?
     @Published private var pendingAttention: [String: PendingAttention] = [:] {
         didSet {
@@ -354,10 +355,7 @@ final class ConnectorController: ObservableObject {
     func start() {
         guard !isRunning else { return }
         if previewOnly {
-            monitoringStarted = true
-            state = .starting
-            requestScan()
-            restartTimer()
+            beginMonitoring()
             return
         }
         guard !token.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
@@ -369,6 +367,15 @@ final class ConnectorController: ObservableObject {
             return
         }
 
+        beginMonitoring()
+        workTimer = Timer.scheduledTimer(withTimeInterval: 30, repeats: true) { [weak self] _ in
+            Task { @MainActor [weak self] in await self?.checkWorkPermission() }
+        }
+        Task { await checkWorkPermission() }
+        startAppServer()
+    }
+
+    private func beginMonitoring() {
         monitoringStarted = true
         state = .starting
         lastError = nil
@@ -379,11 +386,6 @@ final class ConnectorController: ObservableObject {
         heartbeatThrottle.reset()
         requestScan()
         restartTimer()
-        workTimer = Timer.scheduledTimer(withTimeInterval: 30, repeats: true) { [weak self] _ in
-            Task { @MainActor [weak self] in await self?.checkWorkPermission() }
-        }
-        Task { await checkWorkPermission() }
-        startAppServer()
     }
 
     private func startAppServer() {
@@ -518,9 +520,8 @@ final class ConnectorController: ObservableObject {
                 ConnectionTelemetry.recorder.setPermission(!permission.configured ? .unconfigured : permission.state == "active" ? .active : permission.state == "standby" ? .off : .unavailable, revision: permission.revision, remaining: max(0, permission.leaseSeconds - elapsed))
                 if !wasAllowed && workLease.allowsWork() {
                     deliveryRetryAfter = .distantPast
-                    heartbeatThrottle.reset()
                     healthSentAt = .distantPast
-                    if !resumed { requestScan() }
+                    if !resumed { heartbeatThrottle.reset(); requestScan() }
                     drainOutbox()
                 }
             } catch {
@@ -568,6 +569,7 @@ final class ConnectorController: ObservableObject {
         }
         restartTimer()
         startAppServer()
+        heartbeatThrottle.reset()
         requestScan()
         return true
     }
@@ -668,7 +670,12 @@ final class ConnectorController: ObservableObject {
                 } catch { lastError = "Could not queue internal review exclusions; will retry." }
             }
         }
-        switch threadStore.read() {
+        let activeHistoryIDs: Set<String>
+        switch turnStateStore.readActiveThreadIDs() {
+        case .available(let ids): activeHistoryIDs = ids; activeHistoryFailure = nil
+        case .unavailable(let failure): activeHistoryIDs = []; activeHistoryFailure = failure
+        }
+        switch threadStore.read(includingActiveHistoryIDs: activeHistoryIDs) {
         case .available(let threads):
             cachedThreads = threads
             inventoryFailure = nil
@@ -717,6 +724,8 @@ final class ConnectorController: ObservableObject {
             sourceFailure = inventoryDiagnosticCategory(inventoryFailure)
         } else if cachedThreads.isEmpty {
             sourceFailure = nil
+        } else if let activeHistoryFailure {
+            sourceFailure = turnHistoryDiagnosticCategory(activeHistoryFailure)
         } else if let historyFailure {
             sourceFailure = turnHistoryDiagnosticCategory(historyFailure)
         } else if projected.isEmpty {
@@ -728,7 +737,7 @@ final class ConnectorController: ObservableObject {
         sourceFreshness.observe(available: sourceAvailable, at: Date())
         if let sourceFailure {
             diagnostics.record(.localSource, category: sourceFailure,
-                               sqliteDetails: inventoryFailure?.sqliteDetails ?? historyFailure?.sqliteDetails,
+                               sqliteDetails: inventoryFailure?.sqliteDetails ?? activeHistoryFailure?.sqliteDetails ?? historyFailure?.sqliteDetails,
                                queued: pendingEventCount)
         }
         else { diagnostics.success(.localSource, queued: pendingEventCount) }
