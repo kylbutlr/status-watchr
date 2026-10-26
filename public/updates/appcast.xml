@@ -4,8 +4,18 @@ IMPORTANT: This file was signed by Sparkle. Any modifications to this file requi
     <channel>
         <title>Status Watchr</title>
         <item>
+            <title>1.0.2</title>
+            <pubDate>Mon, 26 Oct 2026 16:58:00 +0000</pubDate>
+            <link>https://statuswatchr.netlify.app</link>
+            <sparkle:version>1000002</sparkle:version>
+            <sparkle:shortVersionString>1.0.2</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
+            <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
+            <enclosure url="https://statuswatchr.netlify.app/updates/Status-Watchr-1.0.2.zip" length="2517840" type="application/octet-stream" sparkle:edSignature="l0twvS+xSeFd/eXplMbwT/ig/1uDMUza+NkIZhk8GgJtfkOZg0vWa3la5EWgaW4pwcsfLoV1vunVCHId3vWlCw=="></enclosure>
+        </item>
+        <item>
             <title>1.0.1</title>
-            <pubDate>Fri, 23 Oct 2026 13:11:12 +0000</pubDate>
+            <pubDate>Mon, 26 Oct 2026 16:58:00 +0000</pubDate>
             <link>https://statuswatchr.netlify.app</link>
             <sparkle:version>1000001</sparkle:version>
             <sparkle:shortVersionString>1.0.1</sparkle:shortVersionString>
@@ -15,7 +25,7 @@ IMPORTANT: This file was signed by Sparkle. Any modifications to this file requi
         </item>
         <item>
             <title>1.0.0</title>
-            <pubDate>Fri, 23 Oct 2026 13:11:12 +0000</pubDate>
+            <pubDate>Mon, 26 Oct 2026 16:58:00 +0000</pubDate>
             <link>https://statuswatchr.netlify.app</link>
             <sparkle:version>1000000</sparkle:version>
             <sparkle:shortVersionString>1.0.0</sparkle:shortVersionString>
@@ -23,18 +33,8 @@ IMPORTANT: This file was signed by Sparkle. Any modifications to this file requi
             <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
             <enclosure url="https://statuswatchr.netlify.app/updates/Status-Watchr-1.0.0.zip" length="2516669" type="application/octet-stream" sparkle:edSignature="Qr47+2eG2MjB2yPcNL7vPycMyZFmfUEgQDacRthwqXLd1bwbD9F81pcUaRjvHVAYJnsqbu0ljs5xS1lOariHBg=="></enclosure>
         </item>
-        <item>
-            <title>0.1.44</title>
-            <pubDate>Fri, 23 Oct 2026 13:11:12 +0000</pubDate>
-            <link>https://statuswatchr.netlify.app</link>
-            <sparkle:version>1044</sparkle:version>
-            <sparkle:shortVersionString>0.1.44</sparkle:shortVersionString>
-            <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
-            <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
-            <enclosure url="https://statuswatchr.netlify.app/updates/Status-Watchr-0.1.44.zip" length="2516127" type="application/octet-stream" sparkle:edSignature="w5PHNLSGhCDjQkexs6dcRrjZP5j5eKBRE1xoeUAiGEGJCpIMU1IUF9h9rPECsPPmQaoHswOJq7p1bwlTWJuQAg=="></enclosure>
-        </item>
     </channel>
 </rss><!-- sparkle-signatures:
-edSignature: F6sTigS0Wr2C9GFknO3fdmBMH8sKh9+4FGG0tk4NVdyWWDbLXQQ+W18/XX+43XzJq6tUS0RfLVkkjRHoo36gAA==
+edSignature: LWNplLzWGLcZzLUmdURHZC5vANN8nRCWF2cnt4C38IbmRwaJfw75T0htOZwO9LktlV1aWhAGu5pq6TfbcK+ABw==
 length: 2651
 -->
