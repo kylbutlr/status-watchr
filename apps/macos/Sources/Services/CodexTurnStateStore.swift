@@ -78,6 +78,47 @@ struct CodexTurnStateStore {
         histories(for: threadIDs).compactMapValues { $0.first }
     }
 
+    /// Discover current work independently of the recent conversation inventory.
+    /// An older orphaned inProgress row cannot override the thread's latest turn.
+    func readActiveThreadIDs() -> CodexActiveThreadIDsRead {
+        guard let databaseURL = explicitDatabaseURL ?? codexHome.flatMap(Self.latestDatabase) else {
+            return .unavailable(.databaseMissing)
+        }
+        var database: OpaquePointer?
+        guard sqlite3_open_v2(databaseURL.path, &database, SQLITE_OPEN_READONLY | SQLITE_OPEN_FULLMUTEX, nil) == SQLITE_OK,
+              let database else {
+            if database != nil { sqlite3_close(database) }
+            return .unavailable(.openFailed)
+        }
+        defer { sqlite3_close(database) }
+        sqlite3_busy_timeout(database, 1_000)
+        let query = """
+            SELECT DISTINCT candidate.thread_id FROM thread_turns candidate
+            WHERE candidate.status = 'inProgress' AND candidate.turn_id = (
+                SELECT latest.turn_id FROM thread_turns latest
+                WHERE latest.thread_id = candidate.thread_id
+                ORDER BY COALESCE(latest.started_at, 0) DESC, latest.rollout_ordinal DESC LIMIT 1
+            )
+            """
+        var statement: OpaquePointer?
+        guard sqlite3_prepare_v2(database, query, -1, &statement, nil) == SQLITE_OK, let statement else {
+            let details = CodexSQLiteFailureDetails.capture(
+                from: database, databaseVersion: CodexSQLiteFailureDetails.databaseVersion(of: databaseURL, prefix: "thread_history_")
+            )
+            if let statement { sqlite3_finalize(statement) }
+            return .unavailable(.queryFailed(details))
+        }
+        defer { sqlite3_finalize(statement) }
+        var ids = Set<String>()
+        var result = sqlite3_step(statement)
+        while result == SQLITE_ROW {
+            guard let id = sqlite3_column_text(statement, 0) else { return .unavailable(.readFailed) }
+            ids.insert(String(cString: id))
+            result = sqlite3_step(statement)
+        }
+        return result == SQLITE_DONE ? .available(ids) : .unavailable(.readFailed)
+    }
+
     func histories(for threadIDs: [String]) -> [String: [LocalSessionState]] {
         guard case .available(let histories) = readHistories(for: threadIDs) else { return [:] }
         return histories
