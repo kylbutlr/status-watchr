@@ -14,6 +14,12 @@ conversations, and notification devices stay under your control.
 [Mac companion](apps/macos/README.md) ·
 [Report an issue](https://github.com/kylbutlr/status-watchr/issues)
 
+## Preview
+
+<img src="docs/images/app-preview.webp" width="640" alt="Status Watchr showing fictional agent conversations with working, finished, and attention states">
+
+App preview with demo data. [App overview](https://kylbutlr.com/apps/status-watchr).
+
 ## Availability
 
 Versioned server and source archives are distributed through GitHub Releases,
