@@ -18,7 +18,7 @@ conversations, and notification devices stay under your control.
 
 <img src="docs/images/app-preview.webp" width="640" alt="Status Watchr showing fictional agent conversations with working, finished, and attention states">
 
-App preview with demo data. [App overview](https://kylbutlr.com/apps/status-watchr).
+[Watch the interface preview](docs/images/app-preview.gif). Fictional demonstration data. [App overview](https://kylbutlr.com/apps/status-watchr).
 
 ## Availability
 
@@ -147,8 +147,8 @@ See [contributing](CONTRIBUTING.md) and the [changelog](CHANGELOG.md).
 
 ## Design foundation
 
-The interface uses bundled Geist fonts and [App Stylr v1.2.0](https://github.com/kylbutlr/app-stylr/tree/b3ca31ea264d5dd233fd871ac167247f1c306985),
-with the optional native-control recipe from the pending v1.3.0 refresh.
+The interface uses bundled Geist fonts and [App Stylr v1.4.1](https://github.com/kylbutlr/app-stylr/tree/v1.4.1),
+with its shared control recipe.
 The [Visual Reference](https://kylbutlr.com/app-stylr) explains the shared
 foundation; [implementation notes](docs/app-stylr-exceptions.md) record product
 choices. Layout and application behavior remain owned by Status Watchr.

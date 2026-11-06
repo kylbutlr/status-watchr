@@ -1,0 +1,39 @@
+{
+  "capturedAt": "2026-11-06T08:24:05.388Z",
+  "sourceVersion": "1.2.0",
+  "sourceRevision": "58eb918c20b1d3c6f20c0f915ab1918d1093cd87",
+  "appStylrVersion": "1.4.1",
+  "fictionalData": true,
+  "capture": {
+    "width": 1280,
+    "height": 900,
+    "method": "Viewport-only PNG frames of the actual owning-repository interface in one isolated headless Chromium tab."
+  },
+  "animation": {
+    "width": 960,
+    "height": 675,
+    "frames": 4,
+    "durationMs": 6400
+  },
+  "source": "Built-in development demo with four fictional conversations. Selecting the existing session cards changes the real activity panel. No collector or real notifications were enabled.",
+  "edits": "Resized screenshots and encoded GIF/WebP with presentation pauses. No retouching, text replacement or invented controls.",
+  "coverageLimits": "These visual captures do not establish installed-extension acceptance, signed native binary delivery, live integrations, real monitoring or production data verification.",
+  "rawFrameSHA256": [
+    "fff90b2ec13ef0832efddac361bf2a45762b57bdba9a418f905cb5f92b004cc6",
+    "f0f0c531d619afc1c099312979d36c35cf2a64c4045f06d9b6744711879874ac",
+    "8b8f791fec59fdd21441ce39eb8ce5558a4eae5ee2c0e75efa37052af3e88ab1",
+    "683bfc965ba3e849665a8e03dbbe7dacfd8e6a5f3fc0bb6d13186655456876d1"
+  ],
+  "files": [
+    {
+      "file": "app-preview.webp",
+      "bytes": 35500,
+      "sha256": "fc11b58ed7a0fefdc0cfe34e9718ec4cccace5cb4263f4ed3e438e989fec83da"
+    },
+    {
+      "file": "app-preview.gif",
+      "bytes": 174287,
+      "sha256": "418bca477205434cd23e5a69013160252323335d258f71623a0d4f342939126a"
+    }
+  ]
+}

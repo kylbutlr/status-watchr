@@ -1,0 +1,21 @@
+import {readFile,writeFile,mkdir} from "node:fs/promises";
+import {createRequire} from "node:module";
+import {dirname,join} from "node:path";
+import {fileURLToPath} from "node:url";
+import {execFileSync} from "node:child_process";
+const root=fileURLToPath(new URL("../",import.meta.url)),require=createRequire(import.meta.url);
+const upstream=dirname(require.resolve("app-stylr/package.json"));
+const check=process.argv.includes("--check"),manifest=JSON.parse(await readFile(join(root,"app-stylr.json"),"utf8")),source=JSON.parse(await readFile(join(upstream,"package.json"),"utf8"));
+if(source.version!==manifest.version)throw Error("App Stylr package and recorded pin differ");
+const files=new Map();
+const copy=async(target,input)=>files.set(target,await readFile(join(upstream,input)));
+await copy("src/app-stylr.css","adapters/css/app-stylr.css");
+await copy("src/app-stylr-controls.css","styles/controls.css");
+for(const name of ["Geist-Variable.woff2","GeistMono-Variable.woff2"])await copy(`public/fonts/${name}`,`assets/fonts/${name}`);
+await copy("public/fonts/LICENSE-GEIST.txt","assets/fonts/LICENSE-GEIST.txt");
+files.set("public/favicon.svg",await readFile(join(root,"apps/macos/Resources/StatusWatchrIcon.svg")));
+const output=join(root,"dist/app-stylr-icons");
+execFileSync(process.execPath,[join(upstream,"scripts/generate-icons.mjs"),"--source",join(root,"apps/macos/Resources/StatusWatchrIcon.svg"),"--output",output],{stdio:"pipe",cwd:root});
+for(const [target,input] of [["public/favicon.png","web/favicon-32.png"],["public/apple-touch-icon.png","web/apple-touch-icon.png"],["public/icons/status-watchr-192.png","web/icon-192.png"],["public/icons/status-watchr-512.png","web/icon-512.png"]])files.set(target,await readFile(join(output,input)));
+for(const [name,content] of files){const target=join(root,name);if(check){if(!(await readFile(target)).equals(content))throw Error(`${name} differs from the pinned source; run npm run styles`);}else{await mkdir(dirname(target),{recursive:true});await writeFile(target,content);}}
+console.log(`${check?"Verified":"Generated"} App Stylr ${source.version} foundation and Graphite icons.`);

@@ -1,6 +1,6 @@
 {
   "name": "status-watchr",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -15,7 +15,10 @@
     "start": "node dist/server.mjs",
     "start:local": "WATCHR_AUTH_MODE=none node dist/server.mjs",
     "package": "node scripts/package-release.mjs",
-    "verify:standalone": "node scripts/verify-standalone.mjs"
+    "verify:standalone": "node scripts/verify-standalone.mjs",
+    "styles": "node scripts/sync-app-stylr.mjs",
+    "styles:check": "node scripts/sync-app-stylr.mjs --check",
+    "pretest": "npm run styles:check"
   },
   "dependencies": {
     "@electric-sql/pglite": "^0.5.8",
@@ -35,7 +38,8 @@
     "jsdom": "^26.1.0",
     "typescript": "^5.9.2",
     "vite": "^7.3.7",
-    "vitest": "^5.0.5"
+    "vitest": "^5.0.5",
+    "app-stylr": "https://github.com/kylbutlr/app-stylr/archive/refs/tags/v1.4.1.tar.gz"
   },
   "license": "MIT",
   "description": "Self-hosted backup alerts for selected coding-agent conversations.",

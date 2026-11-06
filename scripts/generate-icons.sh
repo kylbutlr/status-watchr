@@ -15,11 +15,7 @@ master_path="$working_directory/status-watchr-master.png"
 mkdir -p "$public_directory" "$icons_directory" "$macos_resources"
 swift "$script_directory/render-macos-icon.swift" "$master_path"
 
-cp "$repository_root/apps/macos/Resources/StatusWatchrIcon.svg" "$public_directory/favicon.svg"
-sips -z 32 32 "$master_path" --out "$public_directory/favicon.png" >/dev/null
-sips -z 180 180 "$master_path" --out "$public_directory/apple-touch-icon.png" >/dev/null
-sips -z 192 192 "$master_path" --out "$icons_directory/status-watchr-192.png" >/dev/null
-sips -z 512 512 "$master_path" --out "$icons_directory/status-watchr-512.png" >/dev/null
+(cd "$repository_root" && node scripts/sync-app-stylr.mjs)
 
 iconset_directory="$working_directory/StatusWatchr.iconset"
 mkdir -p "$iconset_directory"
