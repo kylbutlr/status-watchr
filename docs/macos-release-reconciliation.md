@@ -28,7 +28,7 @@ The workflow considers both this floor and the live public feed. Local release p
 
 Version comparison now uses explicit decimal arithmetic. The previous zero-padded representation was interpreted as octal by Bash and failed for versions containing 8 or 9, including 0.1.18.
 
-The workflow verifies Kyle Butler <kyle@sdg.la> as author and committer before its release commit, and dry-runs the explicit main/tag destinations before an atomic push. It remains manual. Running it publishes a signed update feed and deploys production, so dispatch requires explicit approval.
+The workflow verifies Kyle Butler <kylbutlr@gmail.com> as author and committer before its release commit, and dry-runs the explicit main/tag destinations before an atomic push. It remains manual. Running it publishes a signed update feed and deploys production, so dispatch requires explicit approval.
 
 ## Remaining gates
 

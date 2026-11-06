@@ -1,0 +1,12 @@
+{
+  "package": "app-stylr",
+  "version": "1.4.1",
+  "source": "Preserved original GitHub release archive, not repacked",
+  "originalUrl": "https://github.com/kylbutlr/app-stylr/archive/refs/tags/v1.4.1.tar.gz",
+  "originalSourceCommit": "6fbc524f07ed7aa7db9c8593bf8116b9440937bc",
+  "archive": "app-stylr-1.4.1.tgz",
+  "sha256": "8395f4843bfdb02377db791dd2691d8e8523f823744e8137694f89cdbc96f719",
+  "integrity": "sha512-qrV8Gmx1ppOFbm3Xw+SyDgJYN14YfTDWWowBVdHbKvHlIL6JYw89Lmy3zg07V0BJNR0ROq2e6virfkdJwkK7zA==",
+  "provenance": "Original sourceRevision values remain historical provenance. The bundled bytes do not depend on future GitHub tag commit IDs.",
+  "update": "Adopt future App Stylr versions deliberately by replacing the versioned archive, verifying its hash, and updating package/lock pins. Do not regenerate existing archives."
+}

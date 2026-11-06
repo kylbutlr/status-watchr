@@ -174,9 +174,9 @@ jobs:
           set -euo pipefail
           version="${{ steps.version.outputs.version }}"
           git config user.name "Kyle Butler"
-          git config user.email "kyle@sdg.la"
-          [[ "$(git var GIT_AUTHOR_IDENT)" == 'Kyle Butler <kyle@sdg.la> '* ]]
-          [[ "$(git var GIT_COMMITTER_IDENT)" == 'Kyle Butler <kyle@sdg.la> '* ]]
+          git config user.email "kylbutlr@gmail.com"
+          [[ "$(git var GIT_AUTHOR_IDENT)" == 'Kyle Butler <kylbutlr@gmail.com> '* ]]
+          [[ "$(git var GIT_COMMITTER_IDENT)" == 'Kyle Butler <kylbutlr@gmail.com> '* ]]
           printf '%s\n' "$version" > apps/macos/Resources/latest-distributed-version.txt
           git add apps/macos/Resources/Info.plist apps/macos/Resources/latest-distributed-version.txt public/updates
           git commit -m "Publish macOS $version Sparkle release [skip ci]"
