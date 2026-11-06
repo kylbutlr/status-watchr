@@ -18,7 +18,7 @@ conversations, and notification devices stay under your control.
 
 <img src="docs/images/app-preview.webp" width="640" alt="Status Watchr showing fictional agent conversations with working, finished, and attention states">
 
-App preview with demo data. [App overview](https://kylbutlr.com/apps/status-watchr).
+[Watch the interface preview](docs/images/app-preview.gif). Fictional demonstration data. [App overview](https://kylbutlr.com/apps/status-watchr).
 
 ## Availability
 
