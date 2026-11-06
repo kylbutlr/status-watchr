@@ -1,6 +1,6 @@
 # Status Watchr agent contract
 
-Status Watchr is a self-hosted web dashboard and macOS companion pinned to [App Stylr v1.2.0 source](https://github.com/kylbutlr/app-stylr/tree/b3ca31ea264d5dd233fd871ac167247f1c306985).
+Status Watchr is a self-hosted web dashboard and macOS companion pinned to [App Stylr v1.4.1 source](https://github.com/kylbutlr/app-stylr/tree/v1.4.1).
 
 ## Interface rules
 
@@ -14,8 +14,12 @@ Status Watchr is a self-hosted web dashboard and macOS companion pinned to [App 
 
 ## Required visual review
 
-Before interface work, review the [App Stylr Visual Reference](https://app-stylr.netlify.app/reference/) and [Style Guide](https://app-stylr.netlify.app/reference/style-guide.html). The pinned v1.2.0 source revision remains the implementation source of truth.
+Before interface work, review the [App Stylr Visual Reference](https://kylbutlr.com/app-stylr) and [Style Guide](https://kylbutlr.com/app-stylr). The pinned v1.4.1 source revision remains the implementation source of truth.
 
 ## Verification
 
 Run `npm run typecheck`, `npm test`, and `npm run build` before considering a change complete.
+
+## Visual foundation maintenance
+
+Keep Sage/dark/Normal defaults, precise 4px controls, 8px cards and 12px dialogs, and quiet semantic feedback. Preserve product layouts and existing glyphs. Keep a scalable SVG master and inspect 16/32px legibility plus 128/512px Retina quality. Use the neutral Graphite base independently of accent palettes. Shared adapters are generated or vendored from the exact public v1.4.1 source, never edited independently.

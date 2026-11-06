@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.2.0
+
+- Pin the shared visual foundation to App Stylr v1.4.1, with charcoal surfaces, Sage accents and precise controls.
+- Replace green icon backgrounds with the neutral Graphite treatment and retain scalable masters plus high-resolution exports.
+- Refresh the public still and animated previews from the actual interface using fictional data.
+
+The 1.2.0 release updates the self-hosted web/server and native source assets. The signed macOS channel remains a separate release.
+
 ## macOS 1.0.1
 
 - Fix a startup crash caused by opening the app's own bundle identifier as a named preferences suite. The installed app now uses its standard domain, preserving existing settings.

@@ -100,7 +100,7 @@ export function faviconStatus(counts: Record<AgentStatus, number>, recentlyFinis
 
 export function faviconHref(status: FaviconStatus) {
   const path = status === "working" ? "/favicon-working.svg" : status === "attention" ? "/favicon-attention.svg" : status === "finished" ? "/favicon-finished.svg" : "/favicon.svg";
-  return `${path}?status=${status}`;
+  return `${path}?status=${status}&v=graphite-2`;
 }
 
 export function faviconTitle(status: FaviconStatus) {

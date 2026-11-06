@@ -32,7 +32,7 @@ describe("agent watchr domain", () => {
     expect(hasRecentlyFinished([finishedSession], now)).toBe(true);
     expect(faviconStatus({ working: 0, needs_you: 0, finished: 1, failed: 0, stale: 0 }, true)).toBe("finished");
     expect(hasRecentlyFinished([expiredSession], now)).toBe(false);
-    expect(faviconHref("finished")).toBe("/favicon-finished.svg?status=finished");
+    expect(faviconHref("finished")).toBe("/favicon-finished.svg?status=finished&v=graphite-2");
     expect(faviconTitle("working")).toBe("Working · Status Watchr");
     expect(faviconTitle("finished")).toBe("Finished · Status Watchr");
     expect(faviconTitle("attention")).toBe("Needs attention · Status Watchr");
@@ -40,9 +40,9 @@ describe("agent watchr domain", () => {
   });
 
   it("uses a distinct cache-busting favicon URL for each status", () => {
-    expect(faviconHref("default")).toBe("/favicon.svg?status=default");
-    expect(faviconHref("working")).toBe("/favicon-working.svg?status=working");
-    expect(faviconHref("attention")).toBe("/favicon-attention.svg?status=attention");
+    expect(faviconHref("default")).toBe("/favicon.svg?status=default&v=graphite-2");
+    expect(faviconHref("working")).toBe("/favicon-working.svg?status=working&v=graphite-2");
+    expect(faviconHref("attention")).toBe("/favicon-attention.svg?status=attention&v=graphite-2");
   });
 
   it("keeps the web polling choices explicit and ordered", () => {

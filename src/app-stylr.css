@@ -1,7 +1,7 @@
 /* Generated from tokens/app-stylr.json by npm run build. Do not edit. */
 
 :root {
-  --app-stylr-version: "1.2.0";
+  --app-stylr-version: "1.4.1";
 
   --brand-ink: #111111;
   --brand-charcoal: #2E3135;
@@ -13,31 +13,31 @@
   --font-sans: "Geist Sans", Inter, ui-sans-serif, system-ui, sans-serif;
   --font-mono: "Geist Mono", ui-monospace, SFMono-Regular, Consolas, monospace;
 
-  --type-display-size: 40px;
-  --type-display-line-height: 44px;
-  --type-display-weight: 700;
-  --type-display-letter-spacing: -0.8px;
-  --type-heading1-size: 32px;
-  --type-heading1-line-height: 38px;
-  --type-heading1-weight: 700;
-  --type-heading1-letter-spacing: -0.64px;
-  --type-heading2-size: 26px;
-  --type-heading2-line-height: 32px;
-  --type-heading2-weight: 650;
-  --type-heading2-letter-spacing: -0.52px;
-  --type-heading3-size: 20px;
-  --type-heading3-line-height: 26px;
+  --type-display-size: 36px;
+  --type-display-line-height: 40px;
+  --type-display-weight: 500;
+  --type-display-letter-spacing: -1.08px;
+  --type-heading1-size: 28px;
+  --type-heading1-line-height: 34px;
+  --type-heading1-weight: 600;
+  --type-heading1-letter-spacing: -0.56px;
+  --type-heading2-size: 22px;
+  --type-heading2-line-height: 28px;
+  --type-heading2-weight: 600;
+  --type-heading2-letter-spacing: -0.44px;
+  --type-heading3-size: 17px;
+  --type-heading3-line-height: 23px;
   --type-heading3-weight: 600;
-  --type-heading3-letter-spacing: -0.4px;
-  --type-body-size: 16px;
-  --type-body-line-height: 24px;
+  --type-heading3-letter-spacing: -0.17px;
+  --type-body-size: 15px;
+  --type-body-line-height: 23px;
   --type-body-weight: 400;
   --type-body-letter-spacing: 0px;
-  --type-small-size: 14px;
-  --type-small-line-height: 20px;
+  --type-small-size: 13px;
+  --type-small-line-height: 19px;
   --type-small-weight: 400;
   --type-small-letter-spacing: 0px;
-  --type-label-size: 13px;
+  --type-label-size: 12px;
   --type-label-line-height: 16px;
   --type-label-weight: 500;
   --type-label-letter-spacing: 0px;
@@ -54,15 +54,15 @@
   --space-32: 32px;
   --space-48: 48px;
   --space-64: 64px;
-  --radius-control: 8px;
-  --radius-card: 12px;
-  --radius-dialog: 16px;
-  --radius-button: 9px;
+  --radius-control: 4px;
+  --radius-card: 8px;
+  --radius-dialog: 12px;
+  --radius-button: 4px;
   --size-control: 44px;
   --size-control-compact: 40px;
   --size-reading-width: 68ch;
-  --motion-control: 160ms;
-  --motion-panel: 240ms;
+  --motion-control: 140ms;
+  --motion-panel: 200ms;
   --motion-sync-pulse: 1200ms;
   --profile-game-minimum-viewport-width: 1024px;
   --profile-game-control-height: 48px;
@@ -75,11 +75,14 @@
   --profile-game-disclosure-toggle-size: 32px;
 
   --icon-canvas: 1024px;
-  --icon-square: 840px;
-  --icon-inset: 92px;
-  --icon-radius: 190px;
+  --icon-square: 1024px;
+  --icon-inset: 0px;
+  --icon-radius: 160px;
   --icon-safe-area: 9%;
+  --icon-background: #262626;
+  --icon-foreground: #F5F5F5;
   --icon-gradient: linear-gradient(135deg, #0D0D0D 0%, #3B4145 48%, #899F98 100%);
+  --icon-monochrome-gradient: linear-gradient(135deg, #383838 0%, #202020 100%);
 }
 
 :root,
@@ -135,4 +138,214 @@
   --ui-info: #315E5A;
   --ui-info-surface: #E6F2EF;
   color-scheme: light;
+}
+
+/* Set theme and accent on the same product root. Mint is the default. */
+[data-app-stylr-accent="mint"] {
+  --ui-canvas: #0E0E10;
+  --ui-sidebar: #121214;
+  --ui-surface: #151517;
+  --ui-surface-raised: #202023;
+  --ui-border: #2A2A2E;
+  --ui-border-strong: #747479;
+  --ui-text: #F5F4F3;
+  --ui-text-muted: #A7A7AE;
+  --ui-accent: #A9CEC2;
+  --ui-accent-text: #111111;
+  --ui-accent-strong: #C3E3D9;
+  --ui-link: #A9CEC2;
+  --ui-focus: #A9CEC2;
+  --ui-selected: #263D39;
+  --ui-selected-text: #F5F4F3;
+  --ui-success: #82D3A7;
+  --ui-success-surface: #173126;
+  --ui-warning: #F2C46F;
+  --ui-warning-surface: #352B18;
+  --ui-danger: #FF9189;
+  --ui-danger-surface: #38201F;
+  --ui-info: #A9CEC2;
+  --ui-info-surface: #1C302D;
+}
+
+[data-app-stylr-accent="mint"][data-app-stylr-theme="light"] {
+  --ui-canvas: #F7FAF9;
+  --ui-sidebar: #EEF4F2;
+  --ui-surface: #FFFFFF;
+  --ui-surface-raised: #FFFFFF;
+  --ui-border: #D8E4E0;
+  --ui-border-strong: #647B81;
+  --ui-text: #111111;
+  --ui-text-muted: #49545B;
+  --ui-accent: #2E3135;
+  --ui-accent-text: #FFFFFF;
+  --ui-accent-strong: #111111;
+  --ui-link: #315E5A;
+  --ui-focus: #315E5A;
+  --ui-selected: #A9CEC2;
+  --ui-selected-text: #111111;
+  --ui-success: #2F6B4F;
+  --ui-success-surface: #E8F5ED;
+  --ui-warning: #8A5A00;
+  --ui-warning-surface: #FFF4D6;
+  --ui-danger: #A33A32;
+  --ui-danger-surface: #FCEBE9;
+  --ui-info: #315E5A;
+  --ui-info-surface: #E6F2EF;
+}
+
+[data-app-stylr-accent="ember"] {
+  --ui-accent: #EF8B7C;
+  --ui-accent-strong: #FFB3A5;
+  --ui-link: #EF8B7C;
+  --ui-focus: #EF8B7C;
+  --ui-selected: #422B27;
+  --ui-info: #EF8B7C;
+  --ui-info-surface: #382420;
+}
+
+[data-app-stylr-accent="ember"][data-app-stylr-theme="light"] {
+  --ui-accent: #A04435;
+  --ui-accent-strong: #783025;
+  --ui-link: #A04435;
+  --ui-focus: #A04435;
+  --ui-selected: #F6DFD9;
+  --ui-info: #A04435;
+  --ui-info-surface: #F7E7E2;
+}
+
+[data-app-stylr-accent="blue"] {
+  --ui-accent: #9BB6CC;
+  --ui-accent-strong: #C1D4E3;
+  --ui-link: #9BB6CC;
+  --ui-focus: #9BB6CC;
+  --ui-selected: #293944;
+  --ui-info: #9BB6CC;
+  --ui-info-surface: #1D2C36;
+}
+
+[data-app-stylr-accent="blue"][data-app-stylr-theme="light"] {
+  --ui-accent: #3E5F78;
+  --ui-accent-strong: #2B465C;
+  --ui-link: #3E5F78;
+  --ui-focus: #3E5F78;
+  --ui-selected: #DFE8EF;
+  --ui-info: #3E5F78;
+  --ui-info-surface: #E7EEF3;
+}
+
+[data-app-stylr-accent="royal"] {
+  --ui-accent: #ADA0CD;
+  --ui-accent-strong: #CEC3E5;
+  --ui-link: #ADA0CD;
+  --ui-focus: #ADA0CD;
+  --ui-selected: #352F45;
+  --ui-info: #ADA0CD;
+  --ui-info-surface: #2B2639;
+}
+
+[data-app-stylr-accent="royal"][data-app-stylr-theme="light"] {
+  --ui-accent: #665181;
+  --ui-accent-strong: #49375F;
+  --ui-link: #665181;
+  --ui-focus: #665181;
+  --ui-selected: #E9E3F1;
+  --ui-info: #665181;
+  --ui-info-surface: #F0ECF6;
+}
+
+[data-app-stylr-accent="amber"] {
+  --ui-accent: #C8B38F;
+  --ui-accent-strong: #E0CFB2;
+  --ui-link: #C8B38F;
+  --ui-focus: #C8B38F;
+  --ui-selected: #3A3227;
+  --ui-info: #C8B38F;
+  --ui-info-surface: #2F291F;
+}
+
+[data-app-stylr-accent="amber"][data-app-stylr-theme="light"] {
+  --ui-accent: #79613F;
+  --ui-accent-strong: #57442B;
+  --ui-link: #79613F;
+  --ui-focus: #79613F;
+  --ui-selected: #EEE6D9;
+  --ui-info: #79613F;
+  --ui-info-surface: #F5F0E7;
+}
+
+[data-app-stylr-accent="monochrome"] {
+  --ui-accent: #29292E;
+  --ui-accent-text: #F5F4F3;
+  --ui-accent-strong: #3C3C44;
+  --ui-link: #B1B1B8;
+  --ui-focus: #94949C;
+  --ui-selected: #202024;
+  --ui-info: #B1B1B8;
+  --ui-info-surface: #252529;
+}
+
+[data-app-stylr-accent="monochrome"][data-app-stylr-theme="light"] {
+  --ui-accent: #F3F3F5;
+  --ui-accent-text: #111111;
+  --ui-accent-strong: #E3E3E7;
+  --ui-link: #55555C;
+  --ui-focus: #696971;
+  --ui-selected: #F0F0F2;
+  --ui-info: #55555C;
+  --ui-info-surface: #EFEFF2;
+}
+
+/* Surface tone is independent of accent. Set all appearance attributes on the same root. */
+[data-app-stylr-tone="normal"] {
+  --ui-canvas: #0E0E10;
+  --ui-sidebar: #121214;
+  --ui-surface: #151517;
+  --ui-surface-raised: #202023;
+  --ui-border: #2A2A2E;
+  --ui-border-strong: #747479;
+}
+
+[data-app-stylr-tone="normal"][data-app-stylr-theme="light"] {
+  --ui-canvas: #F7FAF9;
+  --ui-sidebar: #EEF4F2;
+  --ui-surface: #FFFFFF;
+  --ui-surface-raised: #FFFFFF;
+  --ui-border: #D8E4E0;
+  --ui-border-strong: #647B81;
+}
+
+[data-app-stylr-tone="lighter"] {
+  --ui-canvas: #18181B;
+  --ui-sidebar: #1D1D20;
+  --ui-surface: #222225;
+  --ui-surface-raised: #2D2D31;
+  --ui-border: #3B3B40;
+  --ui-border-strong: #87878E;
+}
+
+[data-app-stylr-tone="lighter"][data-app-stylr-theme="light"] {
+  --ui-canvas: #FCFDFC;
+  --ui-sidebar: #F4F7F6;
+  --ui-surface: #FFFFFF;
+  --ui-surface-raised: #FFFFFF;
+  --ui-border: #E0E8E5;
+  --ui-border-strong: #6B7E82;
+}
+
+[data-app-stylr-tone="darker"] {
+  --ui-canvas: #070709;
+  --ui-sidebar: #0B0B0D;
+  --ui-surface: #101012;
+  --ui-surface-raised: #19191C;
+  --ui-border: #242428;
+  --ui-border-strong: #6F6F76;
+}
+
+[data-app-stylr-tone="darker"][data-app-stylr-theme="light"] {
+  --ui-canvas: #E9EFEC;
+  --ui-sidebar: #E1E9E5;
+  --ui-surface: #F0F5F2;
+  --ui-surface-raised: #F7FAF9;
+  --ui-border: #C2CFCA;
+  --ui-border-strong: #526B71;
 }
