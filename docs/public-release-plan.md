@@ -1,5 +1,11 @@
 # status-watchr: public v1.0.0 release scope
 
+Historical planning record for the initial release, October 22, 2026. Statements
+below describe that preparation, not current availability or installation
+status. For current downloads, separate server/Mac release channels, and setup,
+use the [README](../README.md), [self-hosting guide](self-hosting.md), and
+[Mac companion guide](../apps/macos/README.md).
+
 ## User-approved requirements
 
 - Prepare a professional public-source app using the existing App Stylr design.

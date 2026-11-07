@@ -26,6 +26,9 @@ Versioned server and source archives are distributed through GitHub Releases,
 with file manifests and SHA-256 checksums. Signed Mac downloads use a separate
 native release channel and are not included in the server archive. See the
 [Mac companion guide](apps/macos/README.md) for installation and updates.
+Server/source tags (`v<version>`) and Mac tags (`macos-v<version>`) advance
+independently. The Mac download uses a local signing certificate and is not
+Developer ID signed or Apple-notarized; review the Mac guide before installing.
 
 | Component | Requirements | Installation |
 | --- | --- | --- |
@@ -81,6 +84,11 @@ password protection. Follow [optional passwords and remote access](docs/self-hos
 3. Start monitoring deliberately and choose the conversations to watch.
 4. For phone alerts, configure an HTTPS origin you control, register the device,
    and test delivery before relying on it.
+
+The empty dashboard links directly to these setup steps on desktop and mobile.
+Use the Mac check-in to distinguish a missing connection from a connected Mac
+with no recent activity. Empty filters offer a return to All instead of asking
+you to reconnect an already configured observer.
 
 A localhost address on a phone refers to that phone, not your Mac. Phone access
 requires your own reachable HTTPS setup; the release does not create a tunnel,

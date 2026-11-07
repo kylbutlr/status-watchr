@@ -1,4 +1,5 @@
 import {DashboardPreferences} from "./DashboardPreferences";
+import { ActivityEmptyState } from './ActivityEmptyState';
 import {readPreferences,savePreferences,type DashboardPreferences as Preferences} from "./dashboard-preferences";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { countSessions, savedPollingInterval, demoSessions, elapsedTime, faviconStatus, faviconTitle, finishedFaviconWindowMs, hasRecentlyFinished, mapLiveEvents, mapLiveSessions, pollingIntervalLabel, pollingIntervalOptions, relativeTime, repositoryLabel, statusLabels, type AgentEvent, type AgentSession, type AgentStatus, type FaviconStatus, type PollingInterval } from "./domain";
@@ -516,9 +517,15 @@ function App() {
                   {loadMoreError ? <p className="load-more-error" role="alert">{loadMoreError}</p> : null}
                 </div>
               ) : null}
-              {visibleSessions.length === 0 ? <p className="empty-state">
-                {!isLocalDemo && isRefreshing ? "Loading recent activity…" : liveError ? "Couldn’t load activity. Refresh to try again." : "Nothing in this view."}
-              </p> : null}
+              {visibleSessions.length === 0 ? <ActivityEmptyState
+                loading={!isLocalDemo && (isRefreshing || !lastSyncAt && !liveError)}
+                error={liveError}
+                filtered={filter !== 'all'}
+                health={collectorHealth}
+                onShowAll={() => handleFilterChange('all')}
+                onRefresh={() => void loadLiveSessions(true)}
+                onConnection={() => setShowConnection(true)}
+              /> : null}
             </div>
           </div>
 
@@ -539,7 +546,7 @@ function App() {
               <div className="timeline">
                 {selectedTimeline(selectedSession, timelineEvents, isLocalDemo).map((event) => <TimelineEvent key={event.id} event={event} />)}
               </div>
-            </> : selectedWatch ? <div className="selected-task"><h3>Conversation {selectedWatch.threadId}</h3><p>Retained history is unavailable for this conversation.</p><Notifications threadId={selectedWatch.threadId} demo={isLocalDemo} /></div> : <div className="empty-state">No live activity has arrived yet. Start the Mac collector and refresh this page.</div>}
+            </> : selectedWatch ? <div className="selected-task"><h3>Conversation {selectedWatch.threadId}</h3><p>Retained history is unavailable for this conversation.</p><Notifications threadId={selectedWatch.threadId} demo={isLocalDemo} /></div> : <div className="empty-state">Select a conversation to see its activity and watch settings.</div>}
             <button className="secondary-button" type="button" onClick={() => setShowConnection(true)}>Connection details</button>
           </aside>
         </section>
