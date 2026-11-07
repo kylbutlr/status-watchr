@@ -1,6 +1,10 @@
 # Changelog
 
-## Unreleased
+## 1.2.1
+
+- Include the README preview images in server/source archives and reject packages with missing relative README targets.
+
+- Patch development image tooling while retaining the exact App Stylr visual-source pin.
 
 - Add actionable Mac setup in the activity column on desktop and phones.
 - Distinguish empty filters, stale check-ins, unavailable Codex activity, and failed dashboard requests.
