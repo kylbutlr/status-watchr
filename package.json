@@ -1,6 +1,6 @@
 {
   "name": "status-watchr",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "private": true,
   "type": "module",
   "scripts": {
@@ -45,5 +45,8 @@
   "description": "Self-hosted backup alerts for selected coding-agent conversations.",
   "engines": {
     "node": ">=24.0.0"
+  },
+  "overrides": {
+    "sharp": "0.35.5"
   }
 }
