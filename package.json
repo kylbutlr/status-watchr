@@ -39,7 +39,7 @@
     "typescript": "^5.9.2",
     "vite": "^7.3.7",
     "vitest": "^5.0.5",
-    "app-stylr": "https://github.com/kylbutlr/app-stylr/archive/refs/tags/v1.4.1.tar.gz"
+    "app-stylr": "file:vendor/packages/app-stylr-1.4.1.tgz"
   },
   "license": "MIT",
   "description": "Self-hosted backup alerts for selected coding-agent conversations.",
