@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- Add actionable Mac setup in the activity column on desktop and phones.
+- Distinguish empty filters, stale check-ins, unavailable Codex activity, and failed dashboard requests.
+- Clarify independent server/Mac releases and fresh Mac installation limitations.
+
 ## 1.2.0
 
 - Pin the shared visual foundation to App Stylr v1.4.1, with charcoal surfaces, Sage accents and precise controls.

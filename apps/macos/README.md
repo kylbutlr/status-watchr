@@ -12,8 +12,18 @@ Signed native downloads use separate `macos-v<version>` tags in
 [GitHub Releases](https://github.com/kylbutlr/status-watchr/releases).
 Existing signed installations use Check for
 Updates and the signed appcast at `https://statuswatchr.netlify.app/updates/appcast.xml`.
-Do not confuse the web/server `v1.0.0` source release with this native channel.
-Apple notarization is not claimed. Do not disable macOS security protections.
+Server/source releases use `v<version>` tags; Mac releases use `macos-v<version>`.
+Their version numbers advance independently. Choose the latest release in the
+channel you are updating, rather than comparing the server version to the Mac
+app's Check for Updates result.
+
+Mac downloads use a local signing certificate for their established update
+channel. They are not Developer ID signed or Apple-notarized. A fresh download
+may be blocked by Gatekeeper; the signed update feed does not remove that
+installation limitation. Do not disable macOS security protections. If macOS
+blocks a download, use Apple's
+[official installation guidance](https://support.apple.com/en-us/102445) to
+decide whether to allow that specific app, or build from the source below.
 
 ## Configure your server
 
@@ -22,6 +32,13 @@ Run the standalone server first, then enter its origin and ingestion token from
 `http://127.0.0.1:4288`. Remote origins require HTTPS. Credentials never belong in
 URLs, issue reports, or screenshots. The server token is separate from the
 optional dashboard password. Start monitoring explicitly.
+
+Return to the dashboard and check the Mac's last check-in before looking for
+activity. A connected observer with no recent conversations is different from
+an observer that cannot read Codex history. Check the companion's source status
+if the dashboard reports that local activity is unavailable. Start a Codex
+conversation, then use the dashboard's Watch control if you want alerts for it.
+Watching alone does not enable browser notifications.
 
 Recovery intervals, hooks, and experimental question alerts remain configurable.
 The observer does not start, resume, answer, or approve agent conversations.

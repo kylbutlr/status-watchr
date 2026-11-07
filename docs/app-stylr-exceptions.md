@@ -28,3 +28,11 @@ The product retains its charcoal/mint identity and uses a local candidate of the
 ## App Stylr v1.4.1 visual refresh
 
 The shared adapters and Geist assets come from immutable source 6fbc524f07ed7aa7db9c8593bf8116b9440937bc. Sage/dark/Normal and Comfortable remain the defaults, with existing product preferences preserved. Shared geometry uses 4px controls/buttons, 8px cards and 12px dialogs. Feedback stays on neutral surfaces with semantic text/icons. Existing foreground glyphs use the palette-independent Graphite base, with scalable SVG masters and directly rendered high-resolution exports. Keep the incumbent layout, keyboard behavior, auth, data, integrations and platform-specific controls intact.
+
+## Public-readiness refinements
+
+The existing activity column owns setup, unavailable-source, empty-filter, and
+retry states. Setup remains visible in the phone list view even when the desktop
+detail panel is hidden. These product states use the pinned semantic aliases,
+shared control geometry, and normal browser links; they do not start observers,
+request notification permissions, or change credentials.
